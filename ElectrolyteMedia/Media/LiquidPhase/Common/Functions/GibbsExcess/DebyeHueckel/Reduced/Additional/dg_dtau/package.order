@@ -1,0 +1,9 @@
+calc_dai_dtau
+calc_dloggamma_dtau
+calc_fhelper
+calc_ghelper
+calc_dfhelper_dtau
+calc_dghelper_dtau
+calc_dAlog_dtau
+calc_dAln_dtau
+calc_dBlog_dtau

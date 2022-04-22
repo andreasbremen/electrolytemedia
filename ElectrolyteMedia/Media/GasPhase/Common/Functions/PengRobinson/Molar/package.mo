@@ -1,0 +1,43 @@
+within ElectrolyteMedia.Media.GasPhase.Common.Functions.PengRobinson;
+package Molar "Calculates thermodynamic properties in molar units"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+end Molar;

@@ -1,0 +1,9 @@
+partial_Titration
+NaOH_HCL_titration
+ModelicaExample
+Base
+setState_pTX
+setState_phX
+setState_psX
+setState_dTX
+Titration

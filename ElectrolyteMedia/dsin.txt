@@ -1,0 +1,2251 @@
+#1
+char Aclass(3,24)
+Adymosim
+1.4
+Modelica experiment file
+
+
+#    Experiment parameters
+double experiment(7,1)
+       0                   # StartTime    Time at which integration starts
+                           #              (and linearization and trimming time)
+      20                   # StopTime     Time at which integration stops
+       0                   # Increment    Communication step size, if > 0
+     500                   # nInterval    Number of communication intervals, if > 0
+  1.0000000000000000E-04   # Tolerance    Relative precision of signals for
+                           #              simulation, linearization and trimming
+       0                   # MaxFixedStep Maximum step size of fixed step size
+                           #              integrators, if > 0.0
+       8                   # Algorithm    Integration algorithm as integer (1...28)
+                           #
+                           #             | model|       |        | dense | state |
+                           # Algorithm   | typ  | stiff | order  | output| event |
+                           # ------------+------+-------+--------+-------+-------+
+                           #  1 | deabm  |  ode |   no  |  1-12  |  yes  |   no  |
+                           #  2 | lsode1 |  ode |   no  |  1-12  |  yes  |   no  |
+                           #  3 | lsode2 |  ode |  yes  |  1-5   |  yes  |   no  |
+                           #  4 | lsodar |  ode |  both |1-12,1-5|  yes  |  yes  |
+                           #  5 | dopri5 |  ode |   no  |   5    |   no  |   no  |
+                           #  6 | dopri8 |  ode |   no  |   8    |   no  |   no  |
+                           #  7 | grk4t  |  ode |  yes  |   4    |   no  |   no  |
+                           #  8 | dassl  |  dae |  yes  |  1-5   |  yes  |  yes  |
+                           #  9 | odassl | hdae |  yes  |  1-5   |  yes  |  yes  |
+                           # 10 | mexx   | hdae |   no  |  2-24  |   no  |   no  |
+                           # 11 | euler  |  ode |   no  |   1    |   no  |  yes  |
+                           # 12 | rkfix2 |  ode |   no  |   2    |   no  |  yes  |
+                           # 13 | rkfix3 |  ode |   no  |   3    |   no  |  yes  |
+                           # 14 | rkfix4 |  ode |   no  |   4    |   no  |  yes  |
+                           #>=14| others |  ode |yes/no |  2-5   |   yes |  yes  |
+                           # ---+--------+------+-------+--------+-------+-------+
+                           # euler and rkfix have fixed stepsize.
+
+
+#    Method tuning parameters
+double method(27,1)
+       1                   # grid     type of communication time grid, defined by
+                           #          = 1: equidistant points ("Increment/nInterval")
+                           #          = 2: vector of grid points ("tgrid")
+                           #          = 3: variable step integrator (automatically)
+                           #          = 4: model (call of "increment" in Dymola, e.g.
+                           #                      incr=Time > 2 then 0 else 0.1
+                           #                      dummy=increment(incr))
+                           #          grid = 1,3 is stopped by "StopTime"
+                           #          grid = 2   is stopped by "tgrid(last)"
+                           #          grid = 4   runs forever (stopped by model)
+       1                   # nt       Use every NT time instant, if grid = 3
+       3                   # dense    1/2/3 restart/step/interpolate GRID points
+       1                   # evgrid   0/1 do not/save event points in comm. time grid
+       1                   # evu      0/1 U-discontinuity does not/trigger events
+       0                   # evuord       U-discontinuity order to consider (0,1,...)
+       0                   # error    0/1/2 One message/warning/error messages
+       0                   # jac      0/1 Compute jacobian numerically/by BLOCKJ
+       0                   # xd0c     0/1 Compute/set XD0
+       0                   # f3       0/1 Ignore/use F3 of HDAE (= index 1)
+       0                   # f4       0/1 Ignore/use F4 of HDAE (= index 2)
+       0                   # f5       0/1 Ignore/use F5 of HDAE (= invar.)
+   65536                   # debug    flags for debug information (1<<0 uses pdebug) 
+     100                   # pdebug       priority of debug information (1...100)
+       0                   # fmax     Maximum number of evaluations of BLOCKF, if > 0
+       0                   # ordmax   Maximum allowed integration order, if > 0
+       0                   # hmax     Maximum absolute stepsize, if > 0
+       0                   # hmin     Minimum absolute stepsize, if > 0 (use with care!)
+       0                   # h0       Stepsize to be attempted on first step, if > 0
+  2.0000000000000000E-14   # teps     Bound to check, if 2 equal time instants
+  1.0000000000000000E-10   # eveps    Hysteresis epsilon at event points
+      20                   # eviter   Maximum number of event iterations
+  9.9999999999999995E-07   # delaym   Minimum time increment in delay buffers
+       1                   # fexcep   0/1 floating exception crashes/stops dymosim
+       1                   # tscale   clock-time = tscale*simulation-time, if grid = 5
+                           #          > 1: simulation too slow
+                           #          = 1: simulation-time = real-time
+                           #          < 1: simulation too fast
+       1                   # shared   (not used)
+    2473                   # memkey   (not used)
+
+
+#    Output parameters
+int settings(13,1)
+ 0                         # lprec    0/1 do not/store result data in double
+ 1                         # lx       0/1 do not/store x  (state variables)
+ 1                         # lxd      0/1 do not/store xd (derivative of states)
+ 1                         # lu       0/1 do not/store u  (input     signals)
+ 1                         # ly       0/1 do not/store y  (output    signals)
+ 0                         # lz       0/1 do not/store z  (indicator signals)
+ 1                         # lw       0/1 do not/store w  (auxiliary signals)
+ 1                         # la       0/1 do not/store a  (alias     signals)
+ 0                         # lperf    0/1 do not/store performance indicators
+ 0                         # levent   0/1 do not/store event point
+ 1                         # lres     0/1 do not/store results on result file
+ 0                         # lshare   0/1 do not/store info data for shared memory on dsshare.txt
+ 1                         # lform    0/1 ASCII/Matlab-binary storage format of results
+                           #              (for simulation/linearization; not for trimming)
+
+
+#    Names of initial variables
+char initialName(523,105)
+vaporizer_japa_visc.epsl
+vaporizer_japa_visc.epsv
+vaporizer_japa_visc.q_zu
+vaporizer_japa_visc.p
+vaporizer_japa_visc.Xg0[1]
+vaporizer_japa_visc.molality0[1]
+vaporizer_japa_visc.molality0[2]
+vaporizer_japa_visc.molality0[3]
+vaporizer_japa_visc.vfrac0
+vaporizer_japa_visc.m0
+vaporizer_japa_visc.mi0[1]
+vaporizer_japa_visc.mi0[2]
+vaporizer_japa_visc.mi0[3]
+vaporizer_japa_visc.mi0[4]
+vaporizer_japa_visc.mi0[5]
+vaporizer_japa_visc.Xl0[1]
+vaporizer_japa_visc.Xl0[2]
+vaporizer_japa_visc.Xl0[3]
+vaporizer_japa_visc.Xl0[4]
+vaporizer_japa_visc.Xfull0[1]
+vaporizer_japa_visc.Xfull0[2]
+vaporizer_japa_visc.Xfull0[3]
+vaporizer_japa_visc.Xfull0[4]
+vaporizer_japa_visc.Xfull0[5]
+vaporizer_japa_visc.Xred0[1]
+vaporizer_japa_visc.Xred0[2]
+vaporizer_japa_visc.Xred0[3]
+vaporizer_japa_visc.Xgfeed[1]
+vaporizer_japa_visc.molalityfeed[1]
+vaporizer_japa_visc.molalityfeed[2]
+vaporizer_japa_visc.molalityfeed[3]
+vaporizer_japa_visc.vfracfeed
+vaporizer_japa_visc.mdotfeed
+vaporizer_japa_visc.mdotifeed[1]
+vaporizer_japa_visc.mdotifeed[2]
+vaporizer_japa_visc.mdotifeed[3]
+vaporizer_japa_visc.mdotifeed[4]
+vaporizer_japa_visc.mdotifeed[5]
+vaporizer_japa_visc.Xlfeed[1]
+vaporizer_japa_visc.Xlfeed[2]
+vaporizer_japa_visc.Xlfeed[3]
+vaporizer_japa_visc.Xlfeed[4]
+vaporizer_japa_visc.Xfullfeed[1]
+vaporizer_japa_visc.Xfullfeed[2]
+vaporizer_japa_visc.Xfullfeed[3]
+vaporizer_japa_visc.Xfullfeed[4]
+vaporizer_japa_visc.Xfullfeed[5]
+vaporizer_japa_visc.Xredfeed[1]
+vaporizer_japa_visc.Xredfeed[2]
+vaporizer_japa_visc.Xredfeed[3]
+vaporizer_japa_visc.null_nG[1]
+vaporizer_japa_visc.null_nL[1]
+vaporizer_japa_visc.null_nL[2]
+vaporizer_japa_visc.null_nL[3]
+vaporizer_japa_visc.null_nL[4]
+vaporizer_japa_visc.Xfull_l[1]
+vaporizer_japa_visc.Xfull_l[2]
+vaporizer_japa_visc.Xfull_l[3]
+vaporizer_japa_visc.Xfull_l[4]
+vaporizer_japa_visc.Xfull_l[5]
+vaporizer_japa_visc.Xfull_g[1]
+vaporizer_japa_visc.Xfull_g[2]
+vaporizer_japa_visc.Xfull_g[3]
+vaporizer_japa_visc.Xfull_g[4]
+vaporizer_japa_visc.Xfull_g[5]
+vaporizer_japa_visc.medium.Xi[1]
+vaporizer_japa_visc.medium.Xi[2]
+vaporizer_japa_visc.medium.h
+vaporizer_japa_visc.medium.d
+vaporizer_japa_visc.medium.X[1]
+vaporizer_japa_visc.medium.X[2]
+vaporizer_japa_visc.medium.X[3]
+vaporizer_japa_visc.medium.u
+vaporizer_japa_visc.medium.R
+vaporizer_japa_visc.medium.MM
+vaporizer_japa_visc.medium.state.X[1]
+vaporizer_japa_visc.medium.state.X[2]
+vaporizer_japa_visc.medium.state.X[3]
+vaporizer_japa_visc.medium.state.dg
+vaporizer_japa_visc.medium.preferredMediumStates
+vaporizer_japa_visc.medium.standardOrderComponents
+vaporizer_japa_visc.medium.T_degC
+vaporizer_japa_visc.medium.p_bar
+vaporizer_japa_visc.medium.Yfull[1]
+vaporizer_japa_visc.medium.Yfull[2]
+vaporizer_japa_visc.medium.Yfull[3]
+vaporizer_japa_visc.medium.Yfull[4]
+vaporizer_japa_visc.medium.Yfull[5]
+vaporizer_japa_visc.medium.Xfull[1]
+vaporizer_japa_visc.medium.Xfull[2]
+vaporizer_japa_visc.medium.Xfull[3]
+vaporizer_japa_visc.medium.Xfull[4]
+vaporizer_japa_visc.medium.Xfull[5]
+vaporizer_japa_visc.medium.mfull[1]
+vaporizer_japa_visc.medium.mfull[2]
+vaporizer_japa_visc.medium.mfull[3]
+vaporizer_japa_visc.medium.mfull[4]
+vaporizer_japa_visc.medium.mfull[5]
+vaporizer_japa_visc.medium.gim[1]
+vaporizer_japa_visc.medium.gim[2]
+vaporizer_japa_visc.medium.gim[3]
+vaporizer_japa_visc.medium.gim[4]
+vaporizer_japa_visc.medium.gim[5]
+vaporizer_japa_visc.medium.gi[1]
+vaporizer_japa_visc.medium.gi[2]
+vaporizer_japa_visc.medium.gi[3]
+vaporizer_japa_visc.medium.gi[4]
+vaporizer_japa_visc.medium.gi[5]
+vaporizer_japa_visc.medium.gr[1]
+vaporizer_japa_visc.medium.gr[2]
+vaporizer_japa_visc.medium.K[1]
+vaporizer_japa_visc.medium.K[2]
+vaporizer_japa_visc.medium.logK[1]
+vaporizer_japa_visc.medium.logK[2]
+vaporizer_japa_visc.medium.m[1]
+vaporizer_japa_visc.medium.m[2]
+vaporizer_japa_visc.medium.m[3]
+vaporizer_japa_visc.medium.m[4]
+vaporizer_japa_visc.medium.a[1]
+vaporizer_japa_visc.medium.a[2]
+vaporizer_japa_visc.medium.a[3]
+vaporizer_japa_visc.medium.a[4]
+vaporizer_japa_visc.medium.loga[1]
+vaporizer_japa_visc.medium.loga[2]
+vaporizer_japa_visc.medium.loga[3]
+vaporizer_japa_visc.medium.loga[4]
+vaporizer_japa_visc.medium.gamma[1]
+vaporizer_japa_visc.medium.gamma[2]
+vaporizer_japa_visc.medium.gamma[3]
+vaporizer_japa_visc.medium.gamma[4]
+vaporizer_japa_visc.medium.logreacBase[1]
+vaporizer_japa_visc.medium.pH
+vaporizer_japa_visc.medium.I
+vaporizer_japa_visc.medium.Yg[1]
+vaporizer_japa_visc.medium.Yl[1]
+vaporizer_japa_visc.medium.Yl[2]
+vaporizer_japa_visc.medium.Yl[3]
+vaporizer_japa_visc.medium.Yl[4]
+vaporizer_japa_visc.medium.Xg[1]
+vaporizer_japa_visc.medium.Xl[1]
+vaporizer_japa_visc.medium.Xl[2]
+vaporizer_japa_visc.medium.Xl[3]
+vaporizer_japa_visc.medium.Xl[4]
+vaporizer_japa_visc.medium.phi[1]
+vaporizer_japa_visc.medium.f[1]
+vaporizer_japa_visc.medium.Yfullstart[1]
+vaporizer_japa_visc.medium.Yfullstart[2]
+vaporizer_japa_visc.medium.Yfullstart[3]
+vaporizer_japa_visc.medium.Yfullstart[4]
+vaporizer_japa_visc.medium.Yfullstart[5]
+vaporizer_japa_visc.medium.Xfullstart[1]
+vaporizer_japa_visc.medium.Xfullstart[2]
+vaporizer_japa_visc.medium.Xfullstart[3]
+vaporizer_japa_visc.medium.Xfullstart[4]
+vaporizer_japa_visc.medium.Xfullstart[5]
+vaporizer_japa_visc.medium.Xredstart[1]
+vaporizer_japa_visc.medium.Xredstart[2]
+vaporizer_japa_visc.medium.Xredstart[3]
+vaporizer_japa_visc.medium.Xredstart_[1]
+vaporizer_japa_visc.medium.Xredstart_[2]
+vaporizer_japa_visc.medium.Xredstart_[3]
+vaporizer_japa_visc.medium.mfullstart[1]
+vaporizer_japa_visc.medium.mfullstart[2]
+vaporizer_japa_visc.medium.mfullstart[3]
+vaporizer_japa_visc.medium.mfullstart[4]
+vaporizer_japa_visc.medium.mfullstart[5]
+vaporizer_japa_visc.medium.mstart_[1]
+vaporizer_japa_visc.medium.mstart_[2]
+vaporizer_japa_visc.medium.mstart_[3]
+vaporizer_japa_visc.medium.mstart[1]
+vaporizer_japa_visc.medium.mstart[2]
+vaporizer_japa_visc.medium.mstart[3]
+vaporizer_japa_visc.medium.mstart[4]
+vaporizer_japa_visc.medium.gammastart[1]
+vaporizer_japa_visc.medium.gammastart[2]
+vaporizer_japa_visc.medium.gammastart[3]
+vaporizer_japa_visc.medium.gammastart[4]
+vaporizer_japa_visc.medium.astart[1]
+vaporizer_japa_visc.medium.astart[2]
+vaporizer_japa_visc.medium.astart[3]
+vaporizer_japa_visc.medium.astart[4]
+vaporizer_japa_visc.medium.logastart[1]
+vaporizer_japa_visc.medium.logastart[2]
+vaporizer_japa_visc.medium.logastart[3]
+vaporizer_japa_visc.medium.logastart[4]
+vaporizer_japa_visc.medium.Xgstart[1]
+vaporizer_japa_visc.medium.Xlstart[1]
+vaporizer_japa_visc.medium.Xlstart[2]
+vaporizer_japa_visc.medium.Xlstart[3]
+vaporizer_japa_visc.medium.Xlstart[4]
+vaporizer_japa_visc.medium.Ylstart[1]
+vaporizer_japa_visc.medium.Ylstart[2]
+vaporizer_japa_visc.medium.Ylstart[3]
+vaporizer_japa_visc.medium.Ylstart[4]
+vaporizer_japa_visc.medium.dgstart
+vaporizer_japa_visc.medium.fstart[1]
+vaporizer_japa_visc.medium.Tstart
+vaporizer_japa_visc.medium.pstart
+vaporizer_japa_visc.medium.vfracstart
+vaporizer_japa_visc.medium.Tinitial
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].R
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].G_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].H_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].S_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a3
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a4
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].c1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].c2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].w_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].z
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a_0
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].MM
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].R
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].G_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].H_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].S_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a3
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a4
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].c1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].c2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].w_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].z
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a_0
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].MM
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].R
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].G_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].H_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].S_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a3
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a4
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].c1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].c2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].w_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].z
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a_0
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].MM
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].R
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].G_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].H_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].S_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a3
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a4
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].c1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].c2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].w_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].z
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a_0
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].MM
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].R
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].G_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].H_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].S_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a3
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a4
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].c1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].c2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].w_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].z
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a_0
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].MM
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].R
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].G_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].H_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].S_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a3
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a4
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].c1
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].c2
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].w_ref
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].z
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a_0
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].MM
+_GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].R
+vaporizer_japa_visc.medium_feed.Xi[1]
+vaporizer_japa_visc.medium_feed.Xi[2]
+vaporizer_japa_visc.medium_feed.h
+vaporizer_japa_visc.medium_feed.d
+vaporizer_japa_visc.medium_feed.T
+vaporizer_japa_visc.medium_feed.X[1]
+vaporizer_japa_visc.medium_feed.X[2]
+vaporizer_japa_visc.medium_feed.X[3]
+vaporizer_japa_visc.medium_feed.u
+vaporizer_japa_visc.medium_feed.R
+vaporizer_japa_visc.medium_feed.MM
+vaporizer_japa_visc.medium_feed.state.X[1]
+vaporizer_japa_visc.medium_feed.state.X[2]
+vaporizer_japa_visc.medium_feed.state.X[3]
+vaporizer_japa_visc.medium_feed.state.dg
+vaporizer_japa_visc.medium_feed.preferredMediumStates
+vaporizer_japa_visc.medium_feed.standardOrderComponents
+vaporizer_japa_visc.medium_feed.T_degC
+vaporizer_japa_visc.medium_feed.p_bar
+vaporizer_japa_visc.medium_feed.Yfull[1]
+vaporizer_japa_visc.medium_feed.Yfull[2]
+vaporizer_japa_visc.medium_feed.Yfull[3]
+vaporizer_japa_visc.medium_feed.Yfull[4]
+vaporizer_japa_visc.medium_feed.Yfull[5]
+vaporizer_japa_visc.medium_feed.Xfull[1]
+vaporizer_japa_visc.medium_feed.Xfull[2]
+vaporizer_japa_visc.medium_feed.Xfull[3]
+vaporizer_japa_visc.medium_feed.Xfull[4]
+vaporizer_japa_visc.medium_feed.Xfull[5]
+vaporizer_japa_visc.medium_feed.mfull[1]
+vaporizer_japa_visc.medium_feed.mfull[2]
+vaporizer_japa_visc.medium_feed.mfull[3]
+vaporizer_japa_visc.medium_feed.mfull[4]
+vaporizer_japa_visc.medium_feed.mfull[5]
+vaporizer_japa_visc.medium_feed.gim[1]
+vaporizer_japa_visc.medium_feed.gim[2]
+vaporizer_japa_visc.medium_feed.gim[3]
+vaporizer_japa_visc.medium_feed.gim[4]
+vaporizer_japa_visc.medium_feed.gim[5]
+vaporizer_japa_visc.medium_feed.gi[1]
+vaporizer_japa_visc.medium_feed.gi[2]
+vaporizer_japa_visc.medium_feed.gi[3]
+vaporizer_japa_visc.medium_feed.gi[4]
+vaporizer_japa_visc.medium_feed.gi[5]
+vaporizer_japa_visc.medium_feed.gr[1]
+vaporizer_japa_visc.medium_feed.gr[2]
+vaporizer_japa_visc.medium_feed.K[1]
+vaporizer_japa_visc.medium_feed.K[2]
+vaporizer_japa_visc.medium_feed.logK[1]
+vaporizer_japa_visc.medium_feed.logK[2]
+vaporizer_japa_visc.medium_feed.m[1]
+vaporizer_japa_visc.medium_feed.m[2]
+vaporizer_japa_visc.medium_feed.m[3]
+vaporizer_japa_visc.medium_feed.m[4]
+vaporizer_japa_visc.medium_feed.a[1]
+vaporizer_japa_visc.medium_feed.a[2]
+vaporizer_japa_visc.medium_feed.a[3]
+vaporizer_japa_visc.medium_feed.a[4]
+vaporizer_japa_visc.medium_feed.loga[1]
+vaporizer_japa_visc.medium_feed.loga[2]
+vaporizer_japa_visc.medium_feed.loga[3]
+vaporizer_japa_visc.medium_feed.loga[4]
+vaporizer_japa_visc.medium_feed.gamma[1]
+vaporizer_japa_visc.medium_feed.gamma[2]
+vaporizer_japa_visc.medium_feed.gamma[3]
+vaporizer_japa_visc.medium_feed.gamma[4]
+vaporizer_japa_visc.medium_feed.logreacBase[1]
+vaporizer_japa_visc.medium_feed.pH
+vaporizer_japa_visc.medium_feed.I
+vaporizer_japa_visc.medium_feed.Yg[1]
+vaporizer_japa_visc.medium_feed.Yl[1]
+vaporizer_japa_visc.medium_feed.Yl[2]
+vaporizer_japa_visc.medium_feed.Yl[3]
+vaporizer_japa_visc.medium_feed.Yl[4]
+vaporizer_japa_visc.medium_feed.Xg[1]
+vaporizer_japa_visc.medium_feed.Xl[1]
+vaporizer_japa_visc.medium_feed.Xl[2]
+vaporizer_japa_visc.medium_feed.Xl[3]
+vaporizer_japa_visc.medium_feed.Xl[4]
+vaporizer_japa_visc.medium_feed.phi[1]
+vaporizer_japa_visc.medium_feed.f[1]
+vaporizer_japa_visc.medium_feed.Yfullstart[1]
+vaporizer_japa_visc.medium_feed.Yfullstart[2]
+vaporizer_japa_visc.medium_feed.Yfullstart[3]
+vaporizer_japa_visc.medium_feed.Yfullstart[4]
+vaporizer_japa_visc.medium_feed.Yfullstart[5]
+vaporizer_japa_visc.medium_feed.Xfullstart[1]
+vaporizer_japa_visc.medium_feed.Xfullstart[2]
+vaporizer_japa_visc.medium_feed.Xfullstart[3]
+vaporizer_japa_visc.medium_feed.Xfullstart[4]
+vaporizer_japa_visc.medium_feed.Xfullstart[5]
+vaporizer_japa_visc.medium_feed.Xredstart[1]
+vaporizer_japa_visc.medium_feed.Xredstart[2]
+vaporizer_japa_visc.medium_feed.Xredstart[3]
+vaporizer_japa_visc.medium_feed.Xredstart_[1]
+vaporizer_japa_visc.medium_feed.Xredstart_[2]
+vaporizer_japa_visc.medium_feed.Xredstart_[3]
+vaporizer_japa_visc.medium_feed.mfullstart[1]
+vaporizer_japa_visc.medium_feed.mfullstart[2]
+vaporizer_japa_visc.medium_feed.mfullstart[3]
+vaporizer_japa_visc.medium_feed.mfullstart[4]
+vaporizer_japa_visc.medium_feed.mfullstart[5]
+vaporizer_japa_visc.medium_feed.mstart_[1]
+vaporizer_japa_visc.medium_feed.mstart_[2]
+vaporizer_japa_visc.medium_feed.mstart_[3]
+vaporizer_japa_visc.medium_feed.mstart[1]
+vaporizer_japa_visc.medium_feed.mstart[2]
+vaporizer_japa_visc.medium_feed.mstart[3]
+vaporizer_japa_visc.medium_feed.mstart[4]
+vaporizer_japa_visc.medium_feed.gammastart[1]
+vaporizer_japa_visc.medium_feed.gammastart[2]
+vaporizer_japa_visc.medium_feed.gammastart[3]
+vaporizer_japa_visc.medium_feed.gammastart[4]
+vaporizer_japa_visc.medium_feed.astart[1]
+vaporizer_japa_visc.medium_feed.astart[2]
+vaporizer_japa_visc.medium_feed.astart[3]
+vaporizer_japa_visc.medium_feed.astart[4]
+vaporizer_japa_visc.medium_feed.logastart[1]
+vaporizer_japa_visc.medium_feed.logastart[2]
+vaporizer_japa_visc.medium_feed.logastart[3]
+vaporizer_japa_visc.medium_feed.logastart[4]
+vaporizer_japa_visc.medium_feed.Xgstart[1]
+vaporizer_japa_visc.medium_feed.Xlstart[1]
+vaporizer_japa_visc.medium_feed.Xlstart[2]
+vaporizer_japa_visc.medium_feed.Xlstart[3]
+vaporizer_japa_visc.medium_feed.Xlstart[4]
+vaporizer_japa_visc.medium_feed.Ylstart[1]
+vaporizer_japa_visc.medium_feed.Ylstart[2]
+vaporizer_japa_visc.medium_feed.Ylstart[3]
+vaporizer_japa_visc.medium_feed.Ylstart[4]
+vaporizer_japa_visc.medium_feed.dgstart
+vaporizer_japa_visc.medium_feed.fstart[1]
+vaporizer_japa_visc.medium_feed.Tstart
+vaporizer_japa_visc.medium_feed.pstart
+vaporizer_japa_visc.medium_feed.vfracstart
+vaporizer_japa_visc.medium_feed.Tinitial
+vaporizer_japa_visc.T
+vaporizer_japa_visc.H
+vaporizer_japa_visc.der(H)
+vaporizer_japa_visc.mred[1]
+vaporizer_japa_visc.der(mred[1])
+vaporizer_japa_visc.mred[2]
+vaporizer_japa_visc.der(mred[2])
+vaporizer_japa_visc.mred[3]
+vaporizer_japa_visc.der(mred[3])
+vaporizer_japa_visc.v_out
+vaporizer_japa_visc.l_out
+vaporizer_japa_visc.Xg[1]
+vaporizer_japa_visc.h_g
+vaporizer_japa_visc.h_l
+vaporizer_japa_visc.m
+vaporizer_japa_visc.der(m)
+vaporizer_japa_visc.Xred[3]
+CPUtime
+EventCounter
+
+double initialValue(523,6)
+ -1  8.3199999999999996E-01       0                       0                
+  1   280   # vaporizer_japa_visc.epsl
+ -1  1.6800000000000001E-01       0                       0                
+  1   280   # vaporizer_japa_visc.epsv
+ -1  1.1300000000000000E+06       0                       0                
+  1   280   # vaporizer_japa_visc.q_zu
+ -1    7000                       0                  1.0000000000000000E+08
+  1   280   # vaporizer_japa_visc.p
+ -1       1                       0                       1                
+  1   280   # vaporizer_japa_visc.Xg0[1]
+ -1  1.3460000000000001E+01       0                       0                
+  1   280   # vaporizer_japa_visc.molality0[1]
+ -1  1.3460000000000001E+01       0                       0                
+  1   280   # vaporizer_japa_visc.molality0[2]
+ -1       0                       0                       0                
+  1   280   # vaporizer_japa_visc.molality0[3]
+ -1  1.0000000000000000E-03       0                       0                
+  1   280   # vaporizer_japa_visc.vfrac0
+ -1     200                       0                 1.0000000000000000E+100
+  1   280   # vaporizer_japa_visc.m0
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.mi0[1]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.mi0[2]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.mi0[3]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.mi0[4]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.mi0[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xl0[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xl0[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xl0[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xl0[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull0[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull0[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull0[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull0[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull0[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.Xred0[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.Xred0[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.Xred0[3]
+ -1       1                       0                       1                
+  1   280   # vaporizer_japa_visc.Xgfeed[1]
+ -1  1.3460000000000001E+01       0                       0                
+  1   280   # vaporizer_japa_visc.molalityfeed[1]
+ -1  1.3460000000000001E+01       0                       0                
+  1   280   # vaporizer_japa_visc.molalityfeed[2]
+ -1       0                       0                       0                
+  1   280   # vaporizer_japa_visc.molalityfeed[3]
+ -1  1.0000000000000000E-02       0                       1                
+  1   280   # vaporizer_japa_visc.vfracfeed
+ -1  2.8570000000000002E+00       0                       0                
+  1   280   # vaporizer_japa_visc.mdotfeed
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.mdotifeed[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.mdotifeed[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.mdotifeed[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.mdotifeed[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.mdotifeed[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xlfeed[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xlfeed[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xlfeed[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xlfeed[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfullfeed[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfullfeed[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfullfeed[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfullfeed[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfullfeed[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xredfeed[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xredfeed[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.Xredfeed[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.null_nG[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.null_nL[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.null_nL[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.null_nL[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.null_nL[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_l[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_l[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_l[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_l[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_l[5]
+  0       1                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_g[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_g[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_g[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_g[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xfull_g[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xi[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xi[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.h
+  0      10                       0                  100000                
+  6   256   # vaporizer_japa_visc.medium.d
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.X[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.X[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.X[3]
+  0       0                 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # vaporizer_japa_visc.medium.u
+  0    1000                       0                  1.0000000000000000E+07
+  6   256   # vaporizer_japa_visc.medium.R
+  0  3.2000000000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # vaporizer_japa_visc.medium.MM
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.state.X[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.state.X[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.state.X[3]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium.state.dg
+  0       0                       0                       0                
+  6   257   # vaporizer_japa_visc.medium.preferredMediumStates
+  0       1                       0                       0                
+  6   257   # vaporizer_japa_visc.medium.standardOrderComponents
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.T_degC
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.p_bar
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfull[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfull[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfull[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfull[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfull[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfull[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfull[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfull[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfull[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfull[5]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium.mfull[1]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium.mfull[2]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium.mfull[3]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium.mfull[4]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium.mfull[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gim[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gim[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gim[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gim[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gim[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gi[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gi[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gi[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gi[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gi[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gr[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gr[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.K[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.K[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.logK[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.logK[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.m[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.m[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.m[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.m[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.a[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.a[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.a[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.a[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.loga[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.loga[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.loga[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.loga[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gamma[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gamma[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gamma[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gamma[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.logreacBase[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.pH
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.I
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yg[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yl[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yl[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yl[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yl[4]
+  0       1                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xg[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xl[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xl[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xl[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xl[4]
+  0       1                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.phi[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.f[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfullstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfullstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfullstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfullstart[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Yfullstart[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfullstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfullstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfullstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfullstart[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xfullstart[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xredstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xredstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xredstart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.Xredstart_[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.Xredstart_[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.Xredstart_[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mfullstart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mfullstart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mfullstart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mfullstart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mfullstart[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mstart_[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mstart_[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mstart_[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mstart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mstart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mstart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.mstart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gammastart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gammastart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gammastart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.gammastart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.astart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.astart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.astart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.astart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.logastart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.logastart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.logastart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.logastart[4]
+  0       1                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xgstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xlstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xlstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xlstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Xlstart[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Ylstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Ylstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Ylstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium.Ylstart[4]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium.dgstart
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.fstart[1]
+ -1  2.9814999999999998E+02  2.7314999999999998E+02  5.7314999999999998E+02
+  1   280   # vaporizer_japa_visc.medium.Tstart
+ -1  1.0000000000000000E+06       0                       0                
+  1   280   # vaporizer_japa_visc.medium.pstart
+ -1  1.0000000000000000E-02       0                       0                
+  1   280   # vaporizer_japa_visc.medium.vfracstart
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium.Tinitial
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.R
+  0 -4.1798200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.G_ref
+  0 -4.6986300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.H_ref
+  0  4.4768999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.S_ref
+  0  9.3462000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a1
+  0 -9.7433000000000004E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a2
+  0  2.7900000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a3
+  0 -1.1224000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a4
+  0  1.6797100000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.c1
+  0 -1.5423500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.c2
+  0  -12550                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.a_0
+  0  3.9997999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.MM
+  0  2.0787188859442972E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_aq.R
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[1].R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[2].R
+  0 -4.1798200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].G_ref
+  0 -4.6986300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].H_ref
+  0  4.4768999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].S_ref
+  0  9.3462000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a1
+  0 -9.7433000000000004E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a2
+  0  2.7900000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a3
+  0 -1.1224000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a4
+  0  1.6797100000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].c1
+  0 -1.5423500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].c2
+  0  -12550                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].a_0
+  0  3.9997999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].MM
+  0  2.0787188859442972E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.NaOH_dis[3].R
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[1].R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[2].R
+  0 -4.1798200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].G_ref
+  0 -4.6986300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].H_ref
+  0  4.4768999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].S_ref
+  0  9.3462000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a1
+  0 -9.7433000000000004E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a2
+  0  2.7900000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a3
+  0 -1.1224000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a4
+  0  1.6797100000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].c1
+  0 -1.5423500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].c2
+  0  -12550                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].a_0
+  0  3.9997999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].MM
+  0  2.0787188859442972E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.userInterface.datal[3].R
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[1].R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[2].R
+  0 -4.1798200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].G_ref
+  0 -4.6986300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].H_ref
+  0  4.4768999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].S_ref
+  0  9.3462000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a1
+  0 -9.7433000000000004E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a2
+  0  2.7900000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a3
+  0 -1.1224000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a4
+  0  1.6797100000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].c1
+  0 -1.5423500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].c2
+  0  -12550                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].a_0
+  0  3.9997999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].MM
+  0  2.0787188859442972E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.GasLiquidPhase.SaturatedLiquids.NaOH_dis.datal[3].R
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xi[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xi[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.h
+  0      10                       0                  100000                
+  6   256   # vaporizer_japa_visc.medium_feed.d
+  0     300                  2.7314999999999998E+02  5.7314999999999998E+02
+  6   256   # vaporizer_japa_visc.medium_feed.T
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.X[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.X[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.X[3]
+  0       0                 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # vaporizer_japa_visc.medium_feed.u
+  0    1000                       0                  1.0000000000000000E+07
+  6   256   # vaporizer_japa_visc.medium_feed.R
+  0  3.2000000000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # vaporizer_japa_visc.medium_feed.MM
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.state.X[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.state.X[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.state.X[3]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium_feed.state.dg
+  0       0                       0                       0                
+  6   257   # vaporizer_japa_visc.medium_feed.preferredMediumStates
+  0       1                       0                       0                
+  6   257   # vaporizer_japa_visc.medium_feed.standardOrderComponents
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.T_degC
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.p_bar
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfull[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfull[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfull[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfull[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfull[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfull[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfull[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfull[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfull[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfull[5]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium_feed.mfull[1]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium_feed.mfull[2]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium_feed.mfull[3]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium_feed.mfull[4]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium_feed.mfull[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gim[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gim[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gim[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gim[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gim[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gi[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gi[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gi[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gi[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gi[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gr[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gr[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.K[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.K[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.logK[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.logK[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.m[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.m[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.m[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.m[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.a[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.a[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.a[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.a[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.loga[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.loga[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.loga[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.loga[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gamma[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gamma[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gamma[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gamma[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.logreacBase[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.pH
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.I
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yg[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yl[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yl[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yl[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yl[4]
+  0       1                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xg[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xl[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xl[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xl[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xl[4]
+  0       1                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.phi[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.f[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfullstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfullstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfullstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfullstart[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Yfullstart[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfullstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfullstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfullstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfullstart[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xfullstart[5]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xredstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xredstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xredstart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.Xredstart_[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.Xredstart_[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.Xredstart_[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mfullstart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mfullstart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mfullstart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mfullstart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mfullstart[5]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mstart_[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mstart_[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mstart_[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mstart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mstart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mstart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.mstart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gammastart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gammastart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gammastart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.gammastart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.astart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.astart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.astart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.astart[4]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.logastart[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.logastart[2]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.logastart[3]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.logastart[4]
+  0       1                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xgstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xlstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xlstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xlstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Xlstart[4]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Ylstart[1]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Ylstart[2]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Ylstart[3]
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.medium_feed.Ylstart[4]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # vaporizer_japa_visc.medium_feed.dgstart
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.fstart[1]
+ -1  2.9814999999999998E+02  2.7314999999999998E+02  5.7314999999999998E+02
+  1   280   # vaporizer_japa_visc.medium_feed.Tstart
+ -1  1.0000000000000000E+06       0                       0                
+  1   280   # vaporizer_japa_visc.medium_feed.pstart
+ -1  1.0000000000000000E-02       0                       0                
+  1   280   # vaporizer_japa_visc.medium_feed.vfracstart
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.medium_feed.Tinitial
+  0     300                  2.7314999999999998E+02  5.7314999999999998E+02
+  6   256   # vaporizer_japa_visc.T
+ -1       0                       0                       0                
+  2   272   # vaporizer_japa_visc.H
+  0       0                       0                       0                
+  3   256   # vaporizer_japa_visc.der(H)
+ -1       0                       0                 1.0000000000000000E+100
+  2   272   # vaporizer_japa_visc.mred[1]
+  0       0                       0                       0                
+  3   256   # vaporizer_japa_visc.der(mred[1])
+ -1       0                       0                 1.0000000000000000E+100
+  2   272   # vaporizer_japa_visc.mred[2]
+  0       0                       0                       0                
+  3   256   # vaporizer_japa_visc.der(mred[2])
+ -1       0                       0                 1.0000000000000000E+100
+  2   272   # vaporizer_japa_visc.mred[3]
+  0       0                       0                       0                
+  3   256   # vaporizer_japa_visc.der(mred[3])
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.v_out
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.l_out
+  0       1                       0                       1                
+  6   256   # vaporizer_japa_visc.Xg[1]
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.h_g
+  0       0                       0                       0                
+  6   256   # vaporizer_japa_visc.h_l
+ -1       0                       0                 1.0000000000000000E+100
+  2   272   # vaporizer_japa_visc.m
+  0       0                       0                       0                
+  3   256   # vaporizer_japa_visc.der(m)
+  0       0                       0                       1                
+  6   256   # vaporizer_japa_visc.Xred[3]
+  0       0                       0                       0                
+  4   256   # CPUtime
+  0       0                       0                       0                
+  4   256   # EventCounter
+
+
+# Matrix with 6 columns defining the initial value calculation
+# (columns 5 and 6 are not utilized for the calculation but are
+#  reported by dymosim via dymosim -i for user convenience):
+#
+# column 1: Type of initial value
+#           = -2: special case: for continuing simulation (column 2 = value)
+#           = -1: fixed value (column 2 = fixed value)
+#           =  0: free value, i.e., no restriction (column 2 = initial value)
+#           >  0: desired value (column 1 = weight for optimization
+#                                column 2 = desired value)
+#                 use weight=1, since automatic scaling usually
+#                 leads to equally weighted terms
+# column 2: fixed, free or desired value according to column 1.
+# column 3: Minimum value (ignored, if Minimum >= Maximum).
+# column 4: Maximum value (ignored, if Minimum >= Maximum).
+#           Minimum and maximum restrict the search range in initial
+#           value calculation. They might also be used for scaling.
+# column 5: Category of variable.
+#           = 1: parameter.
+#           = 2: state.
+#           = 3: state derivative.
+#           = 4: output.
+#           = 5: input.
+#           = 6: auxiliary variable.
+# column 6: Data type of variable and flags according to dsBaseType
+#  <value>&3= 0: real.
+#  <value>&3= 1: boolean.
+#  <value>&3= 2: integer.
+#
+# Initial values are calculated according to the following procedure:
+#
+# - If parameters, states and inputs are FIXED, and other variables
+#   are FREE, no special action takes place (default setting).
+#
+# - If there are only FIXED and FREE variables and the number of
+#   FREE parameters, states and inputs is IDENTICAL to the number of
+#   FIXED state derivatives, outputs and auxiliary variables, a non-linear
+#   equation is solved to determine a consistent set of initial conditions.
+#
+# - In all other cases the following optimization problem is solved:
+#      min( sum( weight(i)*( (value(i) - DESIRED(i))/scale(i) )^2 ) )
+#   under the constraint that the differential equation is fulfilled
+#   at the initial time. In most cases weight(i)=1 is sufficient, due
+#   to the automatic scaling (if DESIRED(i) is not close to zero,
+#   scale(i) = DESIRED(i). Otherwise, the scaling is based on the
+#   nominal value (and maybe minimum and maximum values given in 
+#   column 3 and 4). If these values are zero, scale(i)=1 is used).
+#
+char initialDescription(523,114)
+[1]
+[1]
+[W]
+[Pa|bar]
+[1]
+
+
+
+
+[kg]
+[kg]
+[kg]
+[kg]
+[kg]
+[kg]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+
+
+
+[1]
+
+
+
+
+[kg/s]
+[kg/s]
+[kg/s]
+[kg/s]
+[kg/s]
+[kg/s]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+
+
+
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+Structurally independent mass fractions [1]
+Structurally independent mass fractions [1]
+Specific enthalpy of medium [J/kg]
+Density of medium [kg/m3|g/cm3]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Gas density [kg/m3|g/cm3]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+Gibbs free energy of reaction at T and p  [J/mol]
+Gibbs free energy of reaction at T and p  [J/mol]
+Equilibrium constant
+Equilibrium constant
+Logarithmic equilibrium constant
+Logarithmic equilibrium constant
+Molality
+Molality
+Molality
+Molality
+Activity
+Activity
+Activity
+Activity
+
+
+
+
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Logarithmic fugacity for gas and activity for liquid species
+
+
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+Fugacity coefficient
+Fugacity
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+[kg]
+[kg]
+[kg]
+[kg]
+[kg]
+[1]
+[1]
+[1]
+
+
+
+
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+
+
+
+
+
+
+
+
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+Start value for gas density [kg/m3|g/cm3]
+
+[K|degC]
+[Pa|bar]
+
+[K]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Structurally independent mass fractions [1]
+Structurally independent mass fractions [1]
+Specific enthalpy of medium [J/kg]
+Density of medium [kg/m3|g/cm3]
+Temperature of medium [K|degC]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Gas density [kg/m3|g/cm3]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+Gibbs free energy of reaction at T and p  [J/mol]
+Gibbs free energy of reaction at T and p  [J/mol]
+Equilibrium constant
+Equilibrium constant
+Logarithmic equilibrium constant
+Logarithmic equilibrium constant
+Molality
+Molality
+Molality
+Molality
+Activity
+Activity
+Activity
+Activity
+
+
+
+
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Logarithmic fugacity for gas and activity for liquid species
+
+
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+Fugacity coefficient
+Fugacity
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+[kg]
+[kg]
+[kg]
+[kg]
+[kg]
+[1]
+[1]
+[1]
+
+
+
+
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+
+
+
+
+
+
+
+
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+Start value for gas density [kg/m3|g/cm3]
+
+[K|degC]
+[Pa|bar]
+
+[K]
+[K|degC]
+[J]
+[W]
+[kg]
+[kg/s]
+[kg]
+[kg/s]
+[kg]
+[kg/s]
+[kg/s]
+[kg/s]
+[1]
+[J/kg]
+[J/kg]
+[kg]
+[kg/s]
+[1]
+[s]
+
+
