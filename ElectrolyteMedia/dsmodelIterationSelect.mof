@@ -1,7 +1,0 @@
-model dsmodelIterationSelect
-  extends ElectrolyteMedia.Tests.GasLiquidPhase.NaOH_Evaporator.Single_Evaporator.Simulate_Vaporizer_japa_visc;
-  annotation(__Dymola_SimulationIterationVariables={"vaporizer_japa_visc.medium.mfull[5]",
-   "vaporizer_japa_visc.medium.mfull[4]", "vaporizer_japa_visc.medium.loga[2]", 
-  "vaporizer_japa_visc.medium.state.dg", "vaporizer_japa_visc.medium.logreacBase[1]",
-   "vaporizer_japa_visc.medium.loga[1]", "vaporizer_japa_visc.T"});
-end dsmodelIterationSelect;
