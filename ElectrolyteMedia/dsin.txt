@@ -1,0 +1,2319 @@
+#1
+char Aclass(3,24)
+Adymosim
+1.4
+Modelica experiment file
+
+
+#    Experiment parameters
+double experiment(7,1)
+       0                   # StartTime    Time at which integration starts
+                           #              (and linearization and trimming time)
+       1                   # StopTime     Time at which integration stops
+       0                   # Increment    Communication step size, if > 0
+     500                   # nInterval    Number of communication intervals, if > 0
+  1.0000000000000000E-08   # Tolerance    Relative precision of signals for
+                           #              simulation, linearization and trimming
+       0                   # MaxFixedStep Maximum step size of fixed step size
+                           #              integrators, if > 0.0
+       8                   # Algorithm    Integration algorithm as integer (1...28)
+                           #
+                           #             | model|       |        | dense | state |
+                           # Algorithm   | typ  | stiff | order  | output| event |
+                           # ------------+------+-------+--------+-------+-------+
+                           #  1 | deabm  |  ode |   no  |  1-12  |  yes  |   no  |
+                           #  2 | lsode1 |  ode |   no  |  1-12  |  yes  |   no  |
+                           #  3 | lsode2 |  ode |  yes  |  1-5   |  yes  |   no  |
+                           #  4 | lsodar |  ode |  both |1-12,1-5|  yes  |  yes  |
+                           #  5 | dopri5 |  ode |   no  |   5    |   no  |   no  |
+                           #  6 | dopri8 |  ode |   no  |   8    |   no  |   no  |
+                           #  7 | grk4t  |  ode |  yes  |   4    |   no  |   no  |
+                           #  8 | dassl  |  dae |  yes  |  1-5   |  yes  |  yes  |
+                           #  9 | odassl | hdae |  yes  |  1-5   |  yes  |  yes  |
+                           # 10 | mexx   | hdae |   no  |  2-24  |   no  |   no  |
+                           # 11 | euler  |  ode |   no  |   1    |   no  |  yes  |
+                           # 12 | rkfix2 |  ode |   no  |   2    |   no  |  yes  |
+                           # 13 | rkfix3 |  ode |   no  |   3    |   no  |  yes  |
+                           # 14 | rkfix4 |  ode |   no  |   4    |   no  |  yes  |
+                           #>=14| others |  ode |yes/no |  2-5   |   yes |  yes  |
+                           # ---+--------+------+-------+--------+-------+-------+
+                           # euler and rkfix have fixed stepsize.
+
+
+#    Method tuning parameters
+double method(27,1)
+       1                   # grid     type of communication time grid, defined by
+                           #          = 1: equidistant points ("Increment/nInterval")
+                           #          = 2: vector of grid points ("tgrid")
+                           #          = 3: variable step integrator (automatically)
+                           #          = 4: model (call of "increment" in Dymola, e.g.
+                           #                      incr=Time > 2 then 0 else 0.1
+                           #                      dummy=increment(incr))
+                           #          grid = 1,3 is stopped by "StopTime"
+                           #          grid = 2   is stopped by "tgrid(last)"
+                           #          grid = 4   runs forever (stopped by model)
+       1                   # nt       Use every NT time instant, if grid = 3
+       3                   # dense    1/2/3 restart/step/interpolate GRID points
+       1                   # evgrid   0/1 do not/save event points in comm. time grid
+       1                   # evu      0/1 U-discontinuity does not/trigger events
+       0                   # evuord       U-discontinuity order to consider (0,1,...)
+       0                   # error    0/1/2 One message/warning/error messages
+       0                   # jac      0/1 Compute jacobian numerically/by BLOCKJ
+       0                   # xd0c     0/1 Compute/set XD0
+       0                   # f3       0/1 Ignore/use F3 of HDAE (= index 1)
+       0                   # f4       0/1 Ignore/use F4 of HDAE (= index 2)
+       0                   # f5       0/1 Ignore/use F5 of HDAE (= invar.)
+   65536                   # debug    flags for debug information (1<<0 uses pdebug) 
+     100                   # pdebug       priority of debug information (1...100)
+       0                   # fmax     Maximum number of evaluations of BLOCKF, if > 0
+       0                   # ordmax   Maximum allowed integration order, if > 0
+       0                   # hmax     Maximum absolute stepsize, if > 0
+       0                   # hmin     Minimum absolute stepsize, if > 0 (use with care!)
+       0                   # h0       Stepsize to be attempted on first step, if > 0
+  2.0000000000000000E-14   # teps     Bound to check, if 2 equal time instants
+  1.0000000000000000E-10   # eveps    Hysteresis epsilon at event points
+      20                   # eviter   Maximum number of event iterations
+  9.9999999999999995E-07   # delaym   Minimum time increment in delay buffers
+       1                   # fexcep   0/1 floating exception crashes/stops dymosim
+       1                   # tscale   clock-time = tscale*simulation-time, if grid = 5
+                           #          > 1: simulation too slow
+                           #          = 1: simulation-time = real-time
+                           #          < 1: simulation too fast
+       1                   # shared   (not used)
+    2473                   # memkey   (not used)
+
+
+#    Output parameters
+int settings(13,1)
+ 0                         # lprec    0/1 do not/store result data in double
+ 1                         # lx       0/1 do not/store x  (state variables)
+ 1                         # lxd      0/1 do not/store xd (derivative of states)
+ 1                         # lu       0/1 do not/store u  (input     signals)
+ 1                         # ly       0/1 do not/store y  (output    signals)
+ 0                         # lz       0/1 do not/store z  (indicator signals)
+ 1                         # lw       0/1 do not/store w  (auxiliary signals)
+ 1                         # la       0/1 do not/store a  (alias     signals)
+ 0                         # lperf    0/1 do not/store performance indicators
+ 0                         # levent   0/1 do not/store event point
+ 1                         # lres     0/1 do not/store results on result file
+ 0                         # lshare   0/1 do not/store info data for shared memory on dsshare.txt
+ 1                         # lform    0/1 ASCII/Matlab-binary storage format of results
+                           #              (for simulation/linearization; not for trimming)
+
+
+#    Names of initial variables
+char initialName(540,104)
+_dummy
+_derdummy
+T_in
+p_in
+m_in[1]
+m_in[2]
+m_in[3]
+m_in[4]
+m_in[5]
+m_in[6]
+X_in[1]
+X_in[2]
+X_in[3]
+X_in[4]
+X_in[5]
+X_in[6]
+X_in[7]
+Xred_in[1]
+Xred_in[2]
+Xred_in[3]
+Xred_in[4]
+Xred_in[5]
+state.p
+state.T
+state.X[1]
+state.X[2]
+state.X[3]
+state.X[4]
+state.X[5]
+state.Xfull[1]
+state.Xfull[2]
+state.Xfull[3]
+state.Xfull[4]
+state.Xfull[5]
+state.Xfull[6]
+state.Xfull[7]
+d_calc
+cp_calc
+h_calc
+u_calc
+s_calc
+R_calc
+Yfull[1]
+Yfull[2]
+Yfull[3]
+Yfull[4]
+Yfull[5]
+Yfull[6]
+Yfull[7]
+medium.Xi[1]
+medium.Xi[2]
+medium.Xi[3]
+medium.Xi[4]
+medium.h
+medium.d
+medium.X[1]
+medium.X[2]
+medium.X[3]
+medium.X[4]
+medium.X[5]
+medium.u
+medium.R
+medium.MM
+medium.state.X[1]
+medium.state.X[2]
+medium.state.X[3]
+medium.state.X[4]
+medium.state.X[5]
+medium.preferredMediumStates
+medium.standardOrderComponents
+medium.T_degC
+medium.p_bar
+medium.Yfull[1]
+medium.Yfull[2]
+medium.Yfull[3]
+medium.Yfull[4]
+medium.Yfull[5]
+medium.Yfull[6]
+medium.Yfull[7]
+medium.Xfull[1]
+medium.Xfull[2]
+medium.Xfull[3]
+medium.Xfull[4]
+medium.Xfull[5]
+medium.Xfull[6]
+medium.Xfull[7]
+medium.mfull[1]
+medium.mfull[2]
+medium.mfull[3]
+medium.mfull[4]
+medium.mfull[5]
+medium.mfull[6]
+medium.mfull[7]
+medium.gi[1]
+medium.gi[2]
+medium.gi[3]
+medium.gi[4]
+medium.gi[5]
+medium.gi[6]
+medium.gi[7]
+medium.gr[1]
+medium.gr[2]
+medium.K[1]
+medium.K[2]
+medium.logK[1]
+medium.logK[2]
+medium.m[1]
+medium.m[2]
+medium.m[3]
+medium.m[4]
+medium.m[5]
+medium.m[6]
+medium.m[7]
+medium.a[1]
+medium.a[2]
+medium.a[3]
+medium.a[4]
+medium.a[5]
+medium.a[6]
+medium.a[7]
+medium.gamma[1]
+medium.gamma[2]
+medium.gamma[3]
+medium.gamma[4]
+medium.gamma[5]
+medium.gamma[6]
+medium.gamma[7]
+medium.pH
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].R
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].G_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].H_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].S_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a3
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a4
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].c1
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].c2
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].w_ref
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].z
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a_0
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].MM
+_GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].R
+medium.loga[1]
+medium.loga[2]
+medium.loga[3]
+medium.loga[4]
+medium.loga[5]
+medium.loga[6]
+medium.loga[7]
+medium.I
+medium.X_[1]
+medium.X_[2]
+medium.X_[3]
+medium.X_[4]
+medium.X_[5]
+medium.Yfullstart[1]
+medium.Yfullstart[2]
+medium.Yfullstart[3]
+medium.Yfullstart[4]
+medium.Yfullstart[5]
+medium.Yfullstart[6]
+medium.Yfullstart[7]
+medium.Xfullstart[1]
+medium.Xfullstart[2]
+medium.Xfullstart[3]
+medium.Xfullstart[4]
+medium.Xfullstart[5]
+medium.Xfullstart[6]
+medium.Xfullstart[7]
+medium.Xredstart[1]
+medium.Xredstart[2]
+medium.Xredstart[3]
+medium.Xredstart[4]
+medium.Xredstart[5]
+medium.Xredstart_[1]
+medium.Xredstart_[2]
+medium.Xredstart_[3]
+medium.Xredstart_[4]
+medium.Xredstart_[5]
+medium.mstart[1]
+medium.mstart[2]
+medium.mstart[3]
+medium.mstart[4]
+medium.mstart[5]
+medium.mstart[6]
+medium.mstart[7]
+medium.gammastart[1]
+medium.gammastart[2]
+medium.gammastart[3]
+medium.gammastart[4]
+medium.gammastart[5]
+medium.gammastart[6]
+medium.gammastart[7]
+medium.astart[1]
+medium.astart[2]
+medium.astart[3]
+medium.astart[4]
+medium.astart[5]
+medium.astart[6]
+medium.astart[7]
+medium.logastart[1]
+medium.logastart[2]
+medium.logastart[3]
+medium.logastart[4]
+medium.logastart[5]
+medium.logastart[6]
+medium.logastart[7]
+medium.mfullstart[1]
+medium.mfullstart[2]
+medium.mfullstart[3]
+medium.mfullstart[4]
+medium.mfullstart[5]
+medium.mfullstart[6]
+medium.mfullstart[7]
+medium.Tstart
+medium.pstart
+CPUtime
+EventCounter
+
+double initialValue(540,6)
+ -1       1                       0                       0                
+  2     0   # _dummy
+  0       0                       0                       0                
+  3     0   # _derdummy
+ -1     300                       0                 1.0000000000000000E+100
+  1   280   # T_in
+ -1  1.0000000000000000E+06       0                 1.0000000000000000E+100
+  1   280   # p_in
+ -1       5                       0                       0                
+  1   280   # m_in[1]
+ -1       0                       0                       0                
+  1   280   # m_in[2]
+ -1       4                       0                       0                
+  1   280   # m_in[3]
+ -1       0                       0                       0                
+  1   280   # m_in[4]
+ -1       4                       0                       0                
+  1   280   # m_in[5]
+ -1       0                       0                       0                
+  1   280   # m_in[6]
+  0       0                       0                       1                
+  6   256   # X_in[1]
+  0       0                       0                       1                
+  6   256   # X_in[2]
+  0       0                       0                       1                
+  6   256   # X_in[3]
+  0       0                       0                       1                
+  6   256   # X_in[4]
+  0       0                       0                       1                
+  6   256   # X_in[5]
+  0       0                       0                       1                
+  6   256   # X_in[6]
+  0       0                       0                       1                
+  6   256   # X_in[7]
+  0       0                       0                       1                
+  6   256   # Xred_in[1]
+  0       0                       0                       1                
+  6   256   # Xred_in[2]
+  0       0                       0                       1                
+  6   256   # Xred_in[3]
+  0       0                       0                       1                
+  6   256   # Xred_in[4]
+  0       0                       0                       1                
+  6   256   # Xred_in[5]
+  0  1.0000000000000000E+06       0                  1.0000000000000000E+08
+  6   256   # state.p
+  0     300                  2.7314999999999998E+02  5.7314999999999998E+02
+  6   256   # state.T
+  0       0                       0                       1                
+  6   256   # state.X[1]
+  0       0                       0                       1                
+  6   256   # state.X[2]
+  0       0                       0                       1                
+  6   256   # state.X[3]
+  0       0                       0                       1                
+  6   256   # state.X[4]
+  0       0                       0                       1                
+  6   256   # state.X[5]
+  0       0                       0                       0                
+  6   256   # state.Xfull[1]
+  0       0                       0                       0                
+  6   256   # state.Xfull[2]
+  0       0                       0                       0                
+  6   256   # state.Xfull[3]
+  0       0                       0                       0                
+  6   256   # state.Xfull[4]
+  0       0                       0                       0                
+  6   256   # state.Xfull[5]
+  0       0                       0                       0                
+  6   256   # state.Xfull[6]
+  0       0                       0                       0                
+  6   256   # state.Xfull[7]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # d_calc
+  0       0                       0                       0                
+  6   256   # cp_calc
+  0       0                       0                       0                
+  6   256   # h_calc
+  0       0                       0                       0                
+  6   256   # u_calc
+  0       0                       0                       0                
+  6   256   # s_calc
+  0       0                       0                       0                
+  6   256   # R_calc
+  0       0                       0                       1                
+  6   256   # Yfull[1]
+  0       0                       0                       1                
+  6   256   # Yfull[2]
+  0       0                       0                       1                
+  6   256   # Yfull[3]
+  0       0                       0                       1                
+  6   256   # Yfull[4]
+  0       0                       0                       1                
+  6   256   # Yfull[5]
+  0       0                       0                       1                
+  6   256   # Yfull[6]
+  0       0                       0                       1                
+  6   256   # Yfull[7]
+  0       0                       0                       1                
+  6   256   # medium.Xi[1]
+  0       0                       0                       1                
+  6   256   # medium.Xi[2]
+  0       0                       0                       1                
+  6   256   # medium.Xi[3]
+  0       0                       0                       1                
+  6   256   # medium.Xi[4]
+  0       0                       0                       0                
+  6   256   # medium.h
+  0      10                       0                  100000                
+  6   256   # medium.d
+  0       0                       0                       1                
+  6   256   # medium.X[1]
+  0       0                       0                       1                
+  6   256   # medium.X[2]
+  0       0                       0                       1                
+  6   256   # medium.X[3]
+  0       0                       0                       1                
+  6   256   # medium.X[4]
+  0       0                       0                       1                
+  6   256   # medium.X[5]
+  0       0                 -1.0000000000000000E+08  1.0000000000000000E+08
+  6   256   # medium.u
+  0    1000                       0                  1.0000000000000000E+07
+  6   256   # medium.R
+  0  3.2000000000000001E-02  1.0000000000000000E-03  2.5000000000000000E-01
+  6   256   # medium.MM
+  0       0                       0                       1                
+  6   256   # medium.state.X[1]
+  0       0                       0                       1                
+  6   256   # medium.state.X[2]
+  0       0                       0                       1                
+  6   256   # medium.state.X[3]
+  0       0                       0                       1                
+  6   256   # medium.state.X[4]
+  0       0                       0                       1                
+  6   256   # medium.state.X[5]
+  0       0                       0                       0                
+  6   257   # medium.preferredMediumStates
+  0       1                       0                       0                
+  6   257   # medium.standardOrderComponents
+  0       0                       0                       0                
+  6   256   # medium.T_degC
+  0       0                       0                       0                
+  6   256   # medium.p_bar
+  0       0                       0                       1                
+  6   256   # medium.Yfull[1]
+  0       0                       0                       1                
+  6   256   # medium.Yfull[2]
+  0       0                       0                       1                
+  6   256   # medium.Yfull[3]
+  0       0                       0                       1                
+  6   256   # medium.Yfull[4]
+  0       0                       0                       1                
+  6   256   # medium.Yfull[5]
+  0       0                       0                       1                
+  6   256   # medium.Yfull[6]
+  0       0                       0                       1                
+  6   256   # medium.Yfull[7]
+  0       0                       0                       1                
+  6   256   # medium.Xfull[1]
+  0       0                       0                       1                
+  6   256   # medium.Xfull[2]
+  0       0                       0                       1                
+  6   256   # medium.Xfull[3]
+  0       0                       0                       1                
+  6   256   # medium.Xfull[4]
+  0       0                       0                       1                
+  6   256   # medium.Xfull[5]
+  0       0                       0                       1                
+  6   256   # medium.Xfull[6]
+  0       0                       0                       1                
+  6   256   # medium.Xfull[7]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # medium.mfull[1]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # medium.mfull[2]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # medium.mfull[3]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # medium.mfull[4]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # medium.mfull[5]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # medium.mfull[6]
+  0       0                       0                 1.0000000000000000E+100
+  6   256   # medium.mfull[7]
+  0       0                       0                       0                
+  6   256   # medium.gi[1]
+  0       0                       0                       0                
+  6   256   # medium.gi[2]
+  0       0                       0                       0                
+  6   256   # medium.gi[3]
+  0       0                       0                       0                
+  6   256   # medium.gi[4]
+  0       0                       0                       0                
+  6   256   # medium.gi[5]
+  0       0                       0                       0                
+  6   256   # medium.gi[6]
+  0       0                       0                       0                
+  6   256   # medium.gi[7]
+  0       0                       0                       0                
+  6   256   # medium.gr[1]
+  0       0                       0                       0                
+  6   256   # medium.gr[2]
+  0       0                       0                       0                
+  6   256   # medium.K[1]
+  0       0                       0                       0                
+  6   256   # medium.K[2]
+  0       0                       0                       0                
+  6   256   # medium.logK[1]
+  0       0                       0                       0                
+  6   256   # medium.logK[2]
+  0       0                       0                       0                
+  6   256   # medium.m[1]
+  0       0                       0                       0                
+  6   256   # medium.m[2]
+  0       0                       0                       0                
+  6   256   # medium.m[3]
+  0       0                       0                       0                
+  6   256   # medium.m[4]
+  0       0                       0                       0                
+  6   256   # medium.m[5]
+  0       0                       0                       0                
+  6   256   # medium.m[6]
+  0       0                       0                       0                
+  6   256   # medium.m[7]
+  0       0                       0                       0                
+  6   256   # medium.a[1]
+  0       0                       0                       0                
+  6   256   # medium.a[2]
+  0       0                       0                       0                
+  6   256   # medium.a[3]
+  0       0                       0                       0                
+  6   256   # medium.a[4]
+  0       0                       0                       0                
+  6   256   # medium.a[5]
+  0       0                       0                       0                
+  6   256   # medium.a[6]
+  0       0                       0                       0                
+  6   256   # medium.a[7]
+  0       0                       0                       0                
+  6   256   # medium.gamma[1]
+  0       0                       0                       0                
+  6   256   # medium.gamma[2]
+  0       0                       0                       0                
+  6   256   # medium.gamma[3]
+  0       0                       0                       0                
+  6   256   # medium.gamma[4]
+  0       0                       0                       0                
+  6   256   # medium.gamma[5]
+  0       0                       0                       0                
+  6   256   # medium.gamma[6]
+  0       0                       0                       0                
+  6   256   # medium.gamma[7]
+  0       0                       0                       0                
+  6   256   # medium.pH
+  0 -3.9647600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.G_ref
+  0 -4.8576200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.H_ref
+  0  1.7865700000000001E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.S_ref
+  0  4.8616999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a1
+  0  2.1832100000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a2
+  0  1.0497000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a3
+  0 -1.2529400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a4
+  0  1.7604599999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.c1
+  0  -64505                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.c2
+  0  -62760                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.a_0
+  0  6.0052000000000001E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.MM
+  0  1.3845433624192367E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETIC_ACID_aq.R
+  0 -3.6932200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.G_ref
+  0 -4.8601300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.H_ref
+  0  8.6189999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.S_ref
+  0  3.2437000000000001E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a1
+  0  3.6399099999999999E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a2
+  0  3.1724999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a3
+  0 -1.3131500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a4
+  0  1.1003919999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.c1
+  0 -1.6150200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.c2
+  0  5.5153000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.a_0
+  0  5.9043999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.MM
+  0  1.4081803062123163E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.ACETATE.R
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Na_p1.R
+  0 -1.3129000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.G_ref
+  0 -1.6708000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.H_ref
+  0  5.6734999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.S_ref
+  0  1.6869999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a1
+  0  2.0087400000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a2
+  0  2.3275999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a3
+  0 -1.1911800000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a4
+  0 -1.8409600000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.c1
+  0 -2.3907400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.c2
+  0  6.0919000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.z
+  0       3                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.a_0
+  0  3.5450000000000002E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.MM
+  0  2.3454047390691113E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Cl_n1.R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.OH_n1.R
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.G_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.H_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.S_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a3
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a4
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.c1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.c2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.z
+  0       9                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.a_0
+  0  1.0080000000000000E-03       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.MM
+  0  8.2484720238095233E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.H_p1.R
+  0 -3.9647600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].G_ref
+  0 -4.8576200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].H_ref
+  0  1.7865700000000001E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].S_ref
+  0  4.8616999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a1
+  0  2.1832100000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a2
+  0  1.0497000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a3
+  0 -1.2529400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a4
+  0  1.7604599999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].c1
+  0  -64505                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].c2
+  0  -62760                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].a_0
+  0  6.0052000000000001E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].MM
+  0  1.3845433624192367E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[1].R
+  0 -3.6932200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].G_ref
+  0 -4.8601300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].H_ref
+  0  8.6189999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].S_ref
+  0  3.2437000000000001E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a1
+  0  3.6399099999999999E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a2
+  0  3.1724999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a3
+  0 -1.3131500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a4
+  0  1.1003919999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].c1
+  0 -1.6150200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].c2
+  0  5.5153000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].a_0
+  0  5.9043999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].MM
+  0  1.4081803062123163E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[2].R
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[3].R
+  0 -1.3129000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].G_ref
+  0 -1.6708000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].H_ref
+  0  5.6734999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].S_ref
+  0  1.6869999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a1
+  0  2.0087400000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a2
+  0  2.3275999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a3
+  0 -1.1911800000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a4
+  0 -1.8409600000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].c1
+  0 -2.3907400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].c2
+  0  6.0919000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].z
+  0       3                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].a_0
+  0  3.5450000000000002E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].MM
+  0  2.3454047390691113E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[4].R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[5].R
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].G_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].H_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].S_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a3
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a4
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].c1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].c2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].z
+  0       9                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].a_0
+  0  1.0080000000000000E-03       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].MM
+  0  8.2484720238095233E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.Common.SolutesData.Acetic_NaCl[6].R
+  0 -3.9647600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].G_ref
+  0 -4.8576200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].H_ref
+  0  1.7865700000000001E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].S_ref
+  0  4.8616999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a1
+  0  2.1832100000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a2
+  0  1.0497000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a3
+  0 -1.2529400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a4
+  0  1.7604599999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].c1
+  0  -64505                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].c2
+  0  -62760                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].a_0
+  0  6.0052000000000001E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].MM
+  0  1.3845433624192367E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[1].R
+  0 -3.6932200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].G_ref
+  0 -4.8601300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].H_ref
+  0  8.6189999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].S_ref
+  0  3.2437000000000001E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a1
+  0  3.6399099999999999E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a2
+  0  3.1724999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a3
+  0 -1.3131500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a4
+  0  1.1003919999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].c1
+  0 -1.6150200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].c2
+  0  5.5153000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].a_0
+  0  5.9043999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].MM
+  0  1.4081803062123163E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[2].R
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[3].R
+  0 -1.3129000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].G_ref
+  0 -1.6708000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].H_ref
+  0  5.6734999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].S_ref
+  0  1.6869999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a1
+  0  2.0087400000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a2
+  0  2.3275999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a3
+  0 -1.1911800000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a4
+  0 -1.8409600000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].c1
+  0 -2.3907400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].c2
+  0  6.0919000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].z
+  0       3                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].a_0
+  0  3.5450000000000002E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].MM
+  0  2.3454047390691113E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[4].R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[5].R
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].G_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].H_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].S_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a3
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a4
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].c1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].c2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].z
+  0       9                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].a_0
+  0  1.0080000000000000E-03       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].MM
+  0  8.2484720238095233E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.userInterface.data[6].R
+  0 -3.9647600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].G_ref
+  0 -4.8576200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].H_ref
+  0  1.7865700000000001E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].S_ref
+  0  4.8616999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a1
+  0  2.1832100000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a2
+  0  1.0497000000000001E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a3
+  0 -1.2529400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a4
+  0  1.7604599999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].c1
+  0  -64505                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].c2
+  0  -62760                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].w_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].a_0
+  0  6.0052000000000001E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].MM
+  0  1.3845433624192367E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[1].R
+  0 -3.6932200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].G_ref
+  0 -4.8601300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].H_ref
+  0  8.6189999999999998E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].S_ref
+  0  3.2437000000000001E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a1
+  0  3.6399099999999999E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a2
+  0  3.1724999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a3
+  0 -1.3131500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a4
+  0  1.1003919999999999E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].c1
+  0 -1.6150200000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].c2
+  0  5.5153000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].z
+  0  3.7200000000000002E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].a_0
+  0  5.9043999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].MM
+  0  1.4081803062123163E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[2].R
+  0 -2.6188100000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].G_ref
+  0 -2.4030000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].H_ref
+  0  5.8408999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].S_ref
+  0  7.6944000000000004E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a1
+  0 -9.5603999999999996E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a2
+  0  1.3622999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a3
+  0 -1.1405600000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a4
+  0  7.6065100000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].c1
+  0 -1.2472500000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].c2
+  0  1.3832000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].z
+  0  4.2500000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].a_0
+  0  2.2990000000000000E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].MM
+  0  3.6165549369290994E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[3].R
+  0 -1.3129000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].G_ref
+  0 -1.6708000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].H_ref
+  0  5.6734999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].S_ref
+  0  1.6869999999999999E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a1
+  0  2.0087400000000000E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a2
+  0  2.3275999999999999E-04       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a3
+  0 -1.1911800000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a4
+  0 -1.8409600000000001E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].c1
+  0 -2.3907400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].c2
+  0  6.0919000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].z
+  0       3                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].a_0
+  0  3.5450000000000002E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].MM
+  0  2.3454047390691113E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[4].R
+  0 -1.5729700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].G_ref
+  0 -2.3002400000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].H_ref
+  0 -1.0711000000000000E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].S_ref
+  0  5.2413000000000001E-06       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a1
+  0  3.0879999999999999E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a2
+  0  7.7082000000000005E-05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a3
+  0 -1.1640300000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a4
+  0  1.7363600000000002E+01       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].c1
+  0 -4.3287700000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].c2
+  0  7.2157000000000000E+05       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].w_ref
+  0      -1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].z
+  0  3.5000000000000000E+00       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].a_0
+  0  1.7007999999999999E-02       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].MM
+  0  4.8885582079021640E+02       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[5].R
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].G_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].H_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].S_ref
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a3
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a4
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].c1
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].c2
+  0       0                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].w_ref
+  0       1                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].z
+  0       9                       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].a_0
+  0  1.0080000000000000E-03       0                 1.0000000000000000E+100
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].MM
+  0  8.2484720238095233E+03       0                       0                
+  6  1280   # _GlobalScope.ElectrolyteMedia.Media.LiquidPhase.MixtureLiquids.ExampleMedium.data[6].R
+  0       0                       0                       0                
+  6   256   # medium.loga[1]
+  0       0                       0                       0                
+  6   256   # medium.loga[2]
+  0       0                       0                       0                
+  6   256   # medium.loga[3]
+  0       0                       0                       0                
+  6   256   # medium.loga[4]
+  0       0                       0                       0                
+  6   256   # medium.loga[5]
+  0       0                       0                       0                
+  6   256   # medium.loga[6]
+  0       0                       0                       0                
+  6   256   # medium.loga[7]
+  0       0                       0                       0                
+  6   256   # medium.I
+  0       0                       0                       0                
+  6   256   # medium.X_[1]
+  0       0                       0                       0                
+  6   256   # medium.X_[2]
+  0       0                       0                       0                
+  6   256   # medium.X_[3]
+  0       0                       0                       0                
+  6   256   # medium.X_[4]
+  0       0                       0                       0                
+  6   256   # medium.X_[5]
+  0       0                       0                       1                
+  6   256   # medium.Yfullstart[1]
+  0       0                       0                       1                
+  6   256   # medium.Yfullstart[2]
+  0       0                       0                       1                
+  6   256   # medium.Yfullstart[3]
+  0       0                       0                       1                
+  6   256   # medium.Yfullstart[4]
+  0       0                       0                       1                
+  6   256   # medium.Yfullstart[5]
+  0       0                       0                       1                
+  6   256   # medium.Yfullstart[6]
+  0       0                       0                       1                
+  6   256   # medium.Yfullstart[7]
+  0       0                       0                       1                
+  6   256   # medium.Xfullstart[1]
+  0       0                       0                       1                
+  6   256   # medium.Xfullstart[2]
+  0       0                       0                       1                
+  6   256   # medium.Xfullstart[3]
+  0       0                       0                       1                
+  6   256   # medium.Xfullstart[4]
+  0       0                       0                       1                
+  6   256   # medium.Xfullstart[5]
+  0       0                       0                       1                
+  6   256   # medium.Xfullstart[6]
+  0       0                       0                       1                
+  6   256   # medium.Xfullstart[7]
+  0       0                       0                       1                
+  6   256   # medium.Xredstart[1]
+  0       0                       0                       1                
+  6   256   # medium.Xredstart[2]
+  0       0                       0                       1                
+  6   256   # medium.Xredstart[3]
+  0       0                       0                       1                
+  6   256   # medium.Xredstart[4]
+  0       0                       0                       1                
+  6   256   # medium.Xredstart[5]
+  0       0                       0                       0                
+  6   256   # medium.Xredstart_[1]
+  0       0                       0                       0                
+  6   256   # medium.Xredstart_[2]
+  0       0                       0                       0                
+  6   256   # medium.Xredstart_[3]
+  0       0                       0                       0                
+  6   256   # medium.Xredstart_[4]
+  0       0                       0                       0                
+  6   256   # medium.Xredstart_[5]
+  0       0                       0                       0                
+  6   256   # medium.mstart[1]
+  0       0                       0                       0                
+  6   256   # medium.mstart[2]
+  0       0                       0                       0                
+  6   256   # medium.mstart[3]
+  0       0                       0                       0                
+  6   256   # medium.mstart[4]
+  0       0                       0                       0                
+  6   256   # medium.mstart[5]
+  0       0                       0                       0                
+  6   256   # medium.mstart[6]
+  0       0                       0                       0                
+  6   256   # medium.mstart[7]
+  0       0                       0                       0                
+  6   256   # medium.gammastart[1]
+  0       0                       0                       0                
+  6   256   # medium.gammastart[2]
+  0       0                       0                       0                
+  6   256   # medium.gammastart[3]
+  0       0                       0                       0                
+  6   256   # medium.gammastart[4]
+  0       0                       0                       0                
+  6   256   # medium.gammastart[5]
+  0       0                       0                       0                
+  6   256   # medium.gammastart[6]
+  0       0                       0                       0                
+  6   256   # medium.gammastart[7]
+  0       0                       0                       0                
+  6   256   # medium.astart[1]
+  0       0                       0                       0                
+  6   256   # medium.astart[2]
+  0       0                       0                       0                
+  6   256   # medium.astart[3]
+  0       0                       0                       0                
+  6   256   # medium.astart[4]
+  0       0                       0                       0                
+  6   256   # medium.astart[5]
+  0       0                       0                       0                
+  6   256   # medium.astart[6]
+  0       0                       0                       0                
+  6   256   # medium.astart[7]
+  0       0                       0                       0                
+  6   256   # medium.logastart[1]
+  0       0                       0                       0                
+  6   256   # medium.logastart[2]
+  0       0                       0                       0                
+  6   256   # medium.logastart[3]
+  0       0                       0                       0                
+  6   256   # medium.logastart[4]
+  0       0                       0                       0                
+  6   256   # medium.logastart[5]
+  0       0                       0                       0                
+  6   256   # medium.logastart[6]
+  0       0                       0                       0                
+  6   256   # medium.logastart[7]
+  0       0                       0                       0                
+  6   256   # medium.mfullstart[1]
+  0       0                       0                       0                
+  6   256   # medium.mfullstart[2]
+  0       0                       0                       0                
+  6   256   # medium.mfullstart[3]
+  0       0                       0                       0                
+  6   256   # medium.mfullstart[4]
+  0       0                       0                       0                
+  6   256   # medium.mfullstart[5]
+  0       0                       0                       0                
+  6   256   # medium.mfullstart[6]
+  0       0                       0                       0                
+  6   256   # medium.mfullstart[7]
+ -1  2.9814999999999998E+02  2.7314999999999998E+02  5.7314999999999998E+02
+  1   280   # medium.Tstart
+ -1  100000                       0                       0                
+  1   280   # medium.pstart
+  0       0                       0                       0                
+  4   256   # CPUtime
+  0       0                       0                       0                
+  4   256   # EventCounter
+
+
+# Matrix with 6 columns defining the initial value calculation
+# (columns 5 and 6 are not utilized for the calculation but are
+#  reported by dymosim via dymosim -i for user convenience):
+#
+# column 1: Type of initial value
+#           = -2: special case: for continuing simulation (column 2 = value)
+#           = -1: fixed value (column 2 = fixed value)
+#           =  0: free value, i.e., no restriction (column 2 = initial value)
+#           >  0: desired value (column 1 = weight for optimization
+#                                column 2 = desired value)
+#                 use weight=1, since automatic scaling usually
+#                 leads to equally weighted terms
+# column 2: fixed, free or desired value according to column 1.
+# column 3: Minimum value (ignored, if Minimum >= Maximum).
+# column 4: Maximum value (ignored, if Minimum >= Maximum).
+#           Minimum and maximum restrict the search range in initial
+#           value calculation. They might also be used for scaling.
+# column 5: Category of variable.
+#           = 1: parameter.
+#           = 2: state.
+#           = 3: state derivative.
+#           = 4: output.
+#           = 5: input.
+#           = 6: auxiliary variable.
+# column 6: Data type of variable and flags according to dsBaseType
+#  <value>&3= 0: real.
+#  <value>&3= 1: boolean.
+#  <value>&3= 2: integer.
+#
+# Initial values are calculated according to the following procedure:
+#
+# - If parameters, states and inputs are FIXED, and other variables
+#   are FREE, no special action takes place (default setting).
+#
+# - If there are only FIXED and FREE variables and the number of
+#   FREE parameters, states and inputs is IDENTICAL to the number of
+#   FIXED state derivatives, outputs and auxiliary variables, a non-linear
+#   equation is solved to determine a consistent set of initial conditions.
+#
+# - In all other cases the following optimization problem is solved:
+#      min( sum( weight(i)*( (value(i) - DESIRED(i))/scale(i) )^2 ) )
+#   under the constraint that the differential equation is fulfilled
+#   at the initial time. In most cases weight(i)=1 is sufficient, due
+#   to the automatic scaling (if DESIRED(i) is not close to zero,
+#   scale(i) = DESIRED(i). Otherwise, the scaling is based on the
+#   nominal value (and maybe minimum and maximum values given in 
+#   column 3 and 4). If these values are zero, scale(i)=1 is used).
+#
+char initialDescription(540,114)
+dummy
+derdummy
+[K|degC]
+[Pa|bar]
+
+
+
+
+
+
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+Absolute pressure of medium [Pa|bar]
+Temperature of medium [K|degC]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[kg/m3|g/cm3]
+[J/(kg.K)]
+[J/kg]
+[J/kg]
+[J/(kg.K)]
+[J/(kg.K)]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+[1]
+Structurally independent mass fractions [1]
+Structurally independent mass fractions [1]
+Structurally independent mass fractions [1]
+Structurally independent mass fractions [1]
+Specific enthalpy of medium [J/kg]
+Density of medium [kg/m3|g/cm3]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Specific internal energy of medium [J/kg]
+Gas constant (of mixture if applicable) [J/(kg.K)]
+Molar mass (of mixture or single fluid) [kg/mol]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+Mass fractions (= (component mass)/total mass  m_i/m) [kg/kg]
+= true if StateSelect.prefer shall be used for the independent property variables of the medium [:#(type=Boolean)]
+If true, and reducedX = true, the last element of X will be computed from the other ones [:#(type=Boolean)]
+Temperature of medium in [degC] [degC;]
+Absolute pressure of medium in [bar] [bar]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mole fraction vector [mol/mol]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full mass fraction vector [kg/kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+Full amount of substance vector (substitute) [kg]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+[J/mol]
+Gibbs free energy of reaction at T and p  [J/mol]
+Gibbs free energy of reaction at T and p  [J/mol]
+Equilibrium constant
+Equilibrium constant
+Logarithmic equilibrium constant
+Logarithmic equilibrium constant
+Molality
+Molality
+Molality
+Molality
+Molality
+Molality
+Molality
+Activity
+Activity
+Activity
+Activity
+Activity
+Activity
+Activity
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+Activity coefficient [J/kg]
+
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+Molar Gibbs free energy at standard state in J/mol [J/mol]
+Molar enthalpy at reference state in J/mol [J/mol]
+Molar entropy at reference state in J/mol/K [J/(mol.K)]
+HKF parameter in J/mol/Pa
+HKF parameter in J/mol
+HKF parameter in J/mol/K/Pa
+HKF parameter in J/mol/K
+HKF parameter in J/mol/K
+HKF parameter in J*K/mol
+Conventional Born coefficient at standard state in J/mol
+charge of aqueous species
+Kielland parameter for ion size in Debye Hückel equation in Angstrom
+Molar mass of species [kg/mol]
+Specific gas constant [J/(kg.K)]
+
+
+
+
+
+
+
+Molality based ionic strength
+Substitute for X to ensure non-reactive species to be > 0
+Substitute for X to ensure non-reactive species to be > 0
+Substitute for X to ensure non-reactive species to be > 0
+Substitute for X to ensure non-reactive species to be > 0
+Substitute for X to ensure non-reactive species to be > 0
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[mol/mol]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+[kg/kg]
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+for scaling of species moles consistent with maxx invariant vector X
+
+
+
+
+
+
+
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+[J/kg]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[kg]
+[kg]
+[kg]
+[kg]
+[kg]
+[kg]
+[kg]
+[K|degC]
+[Pa|bar]
+[s]
+
+
