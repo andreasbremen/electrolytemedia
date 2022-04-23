@@ -1,3 +1,0 @@
-model dsmodelIterationSelect
-  extends ElectrolyteMedia.Tests.LiquidPhase.setState_pTX;
-end dsmodelIterationSelect;
