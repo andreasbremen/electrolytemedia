@@ -14,4 +14,20 @@ The framework provides multiple [test models](ElectrolyteMedia/Tests/) that show
 
 We will shortly add a reference to a submitted manuscript that discusses the underlying methods for the simulation of aqueous electroylte systems under consideration of chemical equilibrium.
 
+## Current release
 
+Download [ElectrolyteMedia v0.1 (2022-05-09)](../../archive/v0.1.zip)
+
+This is the initial release.
+
+## License
+
+This Modelica package is free software and the use is completely at your own risk;
+it can be redistributed and/or modified under the terms of the [BSD 3-Clause](https://opensource.org/licenses/BSD-3-Clause).
+
+## Contributors
+
+[Andreas M. Bremen](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~obmh/Bremen-Andreas/?lidx=1): Revisited the methods and wrote the code for the `ElectrolyteMedia` package.
+[Alexander Mitsos](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~iswv/Mitsos-Alexander/?lidx=1): Provided ideas and guidance for the development of the code.
+
+We greatfully acknowledge the contributions from various student theses that helped develop and debug the various `Media` packages.
