@@ -20,6 +20,10 @@ Download [ElectrolyteMedia v0.1 (2022-05-09)](../../archive/v0.1.zip)
 
 This is the initial release.
 
+## Compatibility
+
+The `ElectrolyteMedia` pacakage was developed and tested with Dymola 2020x.
+
 ## License
 
 This Modelica package is free software and the use is completely at your own risk;
@@ -27,7 +31,7 @@ it can be redistributed and/or modified under the terms of the [BSD 3-Clause](ht
 
 ## Contributors
 
-[Andreas M. Bremen](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~obmh/Bremen-Andreas/?lidx=1): Revisited the methods and wrote the code for the `ElectrolyteMedia` package.
-[Alexander Mitsos](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~iswv/Mitsos-Alexander/?lidx=1): Provided ideas and guidance for the development of the code.
+* [Andreas M. Bremen](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~obmh/Bremen-Andreas/?lidx=1): Revisited the methods and wrote the code for the `ElectrolyteMedia` package.
+* [Alexander Mitsos](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~iswv/Mitsos-Alexander/?lidx=1): Provided ideas and guidance for the development of the code.
 
 We greatfully acknowledge the contributions from various student theses that helped develop and debug the various `Media` packages.
