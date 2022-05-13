@@ -1,0 +1,27 @@
+within ElectrolyteMedia.Media.SolidLiquidPhase.MixtureLiquids;
+package KCl_NaCl
+extends Common.MixtureLiquid(userInterface(
+      ns=2,
+      solidSubstanceNames={"KCl","NaCl"},
+      datas=SolidPhase.Common.SolidData.KCl_NaCl,
+      nL=6,
+      LiquidModel=ElectrolyteMedia.Media.Common.Types.LiquidModel.Ideal,
+      liquidSubstanceNames={"K+","Cl-","Na+","OH-","H+","H2O"},
+      datal=LiquidPhase.Common.SolutesData.KCl_NaCl,
+      interactionL=LiquidPhase.Common.MixtureSolutesData.KCl_NaCl,
+    nR=3,
+    nu=[-1,0,1,1,0,0,0,0; 0,-1,0,1,1,0,0,0; 0,0,0,0,0,1,1,-1],
+      mediumName="NaCl",
+    Tstart=298.15,
+    pstart=100000,
+    useLiquidMassFraction=false,
+    useLiquidMoleFraction=true,
+    useLiquidMolality=false,
+      refYl={0,0,0,1e-7,1e-7,1 - 2e-7},
+      useSolidMassFraction=true,
+      usePhaseMassFraction=true,
+    refLiquidMassFraction=0.5));       //refml={1,2,1,0,0,0},
+    //refYl={0,0,0,1e-7,1e-7,1 - 2e-7},
+                                //true,
+                           //false,
+end KCl_NaCl;

@@ -1,0 +1,30 @@
+within ElectrolyteMedia.Media.SolidLiquidPhase.MixtureLiquids;
+package ReactiveTransport
+extends Common.MixtureLiquid(userInterface(
+      ns=3,
+      solidSubstanceNames={"Quartz","Calcite","Dolomite"},
+      datas=SolidPhase.Common.SolidData.ReactiveTransport,
+      nL=11,
+    LiquidModel=ElectrolyteMedia.Media.Common.Types.LiquidModel.Ideal,
+      liquidSubstanceNames={"CO2","HCO3-","CO3-2","Mg+2","Ca+2","Na+","Cl-","SiO2","OH-","H+",
+          "H2O"},
+      datal=LiquidPhase.Common.SolutesData.ReactiveTransport,
+      interactionL=LiquidPhase.Common.MixtureSolutesData.ReactiveTransport,
+      nR=6,
+      nu=[1,0,0,0,0,0,0,0,0,0,-1,0,0,0; 0,0,1,0,0,-2,-1,-1,0,0,0,0,0,0; 0,1,0,0,0,-1,0,-1,0,0,0,0,0,0;0,0,0,-1,1,0,0,0,0,0,0,0,1,-1; 0,0,0,0,-1,1,0,0,0,0,
+          0,0,1,0; 0,0,0,0,0,0,0,0,0,0,0,-1,-1,1],
+      mediumName="ReactiveTransport",
+      Tstart=333.15,
+      pstart=1000000,
+    useLiquidMassFraction=false,
+    useLiquidMoleFraction=false,
+    useLiquidMolality=true,
+    refml={0,0,0,0,0,0,0,0,0,0},
+    useSolidMassFraction=false,
+    useSolidVolumeFraction=true,
+      refPhis={0.98,0.02 - 0,0},
+    usePhaseMassFraction=false,
+    usePhaseVolumeFraction=true,
+    refLiquidVolumeFraction=0.5));
+                                //{0.75,0,0,0.05,0.01,0.9,1.02,0,0,0},
+end ReactiveTransport;
