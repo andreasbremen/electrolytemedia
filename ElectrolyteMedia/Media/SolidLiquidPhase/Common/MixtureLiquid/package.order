@@ -17,6 +17,8 @@ nu_id
 P_to_orig
 P_to_id
 lambda_id
+lambda_mass_id
+lambda_mass_id_orig
 MMX_id
 userInterface
 MH2O

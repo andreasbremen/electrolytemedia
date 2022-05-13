@@ -36,33 +36,16 @@ algorithm
 
   z :=tau./n;
 
-  diagH[1:ns] :=tau ./ n[1:ns] .^ 2;//z[1:ns]./n[1:ns];//
-  diagH[ns+1:ns+nL] :=(1 .- Yl .+ z[ns+1:ns+nL]) ./ n[ns + 1:ns + nL];// + tau ./ n[ns+1:ns+nL] .^ 2;//(1 .- Yl) ./ n[ns + 1:ns + nL] + tau ./ n[ns+1:ns+nL] .^ 2;
+  diagH[1:ns] :=tau ./ n[1:ns] .^ 2;
+  diagH[ns+1:ns+nL] :=(1 .- Yl .+ z[ns+1:ns+nL]) ./ n[ns + 1:ns + nL];
 
-  H :=diagonal(diagH);//fill(diagH,ns+nL);//
+  H :=diagonal(diagH);
   H_id :=transpose(P_to_id)*H;
 
-//    for i in 1:ns+nL loop
-//      //isopotential
-//      for r in 1:nR loop
-//        if i < ns+1 then
-//           J[r,i] := nu[r,i]*tau/x[i]^2 else 0;//nu[r,i]*z[i]/n[i] else 0;//if abs(nu[r,i]) > 0 then nu[r,i]*z[i]/n[i] else 0;
-//         else
-//           J[r,i] := if abs(nu[r,i])>0 then nu[r, i]*(1 - Yl[i - ns])/x[i] + nu[r,i]*tau/x[i]^2 else 0;//nu[r, i]*(1 - Yl[i - ns])/n[i] + nu[r,i]*z[i]/n[i] else 0;//if abs(nu[r,i]) > 0 then nu[r, i]*(1 - Yl[i - ns])/n[i] + nu[r,i]*z[i]/n[i] else 0;
-//         end if;
-//      end for;
-//    end for;
-
   //isopotential
-//   for r in 1:nR loop
-//     J[r,:] :=nu[r,:].*diagH;
-//   end for;
-     J[1:nR,:] :=nu*H;//nu_id__ .* H;//nu_id__*H;//
-     J[1:nR,:] :=J[1:nR, :]*transpose(P_to_id);//transpose(P_nu_id);
-
-//      J[1:nR,:] :=nu_id_ .* H_id;
-//     J[1:nR,:] :=nu_id .* H_id;
+  J[1:nR,:] :=nu*H;
+  J[1:nR,:] :=J[1:nR, :]*transpose(P_to_id);
 
   //reduced mass balance
-   J[nR+1:nF,:] :=transpose(lambda_id);
+  J[nR+1:nF,:] :=transpose(lambda_id);
 end SLE_Tp;

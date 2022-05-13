@@ -10,6 +10,4 @@ package Initialization "Package containing all functions regarding initializatio
 //   constant DataRecordL[nL-1] datal;
 //   constant Media.Common.Types.LiquidModel LiquidModel;
 
-
-
 end Initialization;

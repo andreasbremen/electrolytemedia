@@ -21,7 +21,6 @@ package MixtureLiquid
   redeclare record extends ThermodynamicState "Thermodynamic state variables"
     Real[nF] Xfull;
   end ThermodynamicState;
-
   constant SI.Pressure prefg = 1e5 "Reference pressure for gas phase";
   constant DataRecordL[nL-1] datal=userInterface.datal;
   constant LiquidInteractionDataRecord interactionL=userInterface.interactionL;
@@ -41,14 +40,14 @@ package MixtureLiquid
   constant Real[nR,nF] nu_id= Media.Common.Reaction.calc_nu_id(nu) "Identity transformation of stoichiometry matrix for initialization";
   constant Integer[nF,nF] P_to_orig=Media.Common.Reaction.calc_P_nu_id(nu) "Permutation matrix between original order and identity transformation";
   constant Integer[nF,nF] P_to_id = transpose(P_to_orig) "Permutation matrix between identity transformation and original order";
-  constant Real[nF,nX] lambda_id = Media.Common.Reaction.calc_lambda_id(nu_id) "lambda in identity transformation";
-                                                                                                                   // transpose(cat(2,-transpose(nu_id[:,nR+1:nF]),identity(nX)))
+  constant Real[nF,nX] lambda_id =  Media.Common.Reaction.calc_lambda_id(nu_id) "lambda in identity transformation";
+  constant Real[nF,nX] lambda_mass_id=P_to_id*lambda_mass "Transformed nullspace of mass based stoichiometry matrix";
+  constant Real[nF,nX] lambda_mass_id_orig = P_to_orig * {{lambda_id[i,j]/MMX_id[i] for j in 1:nX} for i in 1:nF} "Mass based nullspace back transformed from identity transofrmation";
   constant Real[nF] MMX_id = P_to_id*MMX;
 
   constant UserInterface
     userInterface "User interface"
     annotation (Placement(transformation(extent={{-10,-8},{10,12}})));
-
 
   constant MolarMass MH2O = IF97.MH2O "Molar mass of solvent";
   constant SpecificHeatCapacity RH2O = IF97.RH2O;
@@ -156,9 +155,8 @@ package MixtureLiquid
     logK = -gr / Modelica.Constants.R / T;
     K = exp(logK);
     log10K = log10(K);
-    logreacBase = cat(1,-z[1:ns],loga);//-z[1+ns:ns+nL]);
-    //    nu*logreacBase = logK;
-     nu*logreacBase./logK = ones(nR);
+    logreacBase = cat(1,-z[1:ns],loga);
+    nu*logreacBase./logK = ones(nR);
     a = exp(loga);
     pH = -loga[Hindex-ns]*log10(exp(1));
     Phil = Functions.calc_Phil(T,p,Xfull);
@@ -267,7 +265,6 @@ protected
     annotation(Inline = true, smoothOrder = 3);
   end density;
 
-
   redeclare function extends molarMass "Return molar mass of mixture"
   algorithm
     MM := Functions.calc_MM(state.Xfull);
@@ -354,16 +351,4 @@ protected
   eta := 1;//Common.Functions.IF97_R1_Tp.calc_eta(state.p,state.T);
   annotation (smoothOrder=2);
   end dynamicViscosity;
-
-
-
-
-
-
-
-
-
-
-
-
 end MixtureLiquid;

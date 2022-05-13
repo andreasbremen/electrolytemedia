@@ -31,7 +31,6 @@ protected
   Integer index;
 
   Real[nX] Xs;
-  Real[nF,nX] lambda_mass_id = P_to_id * lambda_mass;
 algorithm
   //ensure no species amount to be zero for numerical issues
   for i in 1:nX loop
@@ -43,12 +42,12 @@ algorithm
   Xfull :=cat(1,zeros(nF - nX),Xs);
   Xfull :=P_to_orig*Xfull;
 
-  Xred_ :=transpose(lambda_mass)*Xfull;
+  Xred_ :=transpose(lambda_mass_id_orig)*Xfull;
 
   // find initial guess x1 for Newton solver
   if sum(Xinit)> 0 then
   // ninit from initial guess provided as input (Xinit)
-     scale :=sum(transpose(lambda_mass)*Xinit);
+     scale :=sum(transpose(lambda_mass_id_orig)*Xinit);
      minit :=Xinit*scale;
      ninit :=minit./MMX;
      for i in 1:nF loop

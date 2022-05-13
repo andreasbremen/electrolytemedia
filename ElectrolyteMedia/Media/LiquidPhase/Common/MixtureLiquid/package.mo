@@ -18,14 +18,7 @@ package MixtureLiquid "Medium model of a mixture of liquids based on Modelica li
      Density(start=10, nominal=10),
      AbsolutePressure(start=10e5, nominal=10e5),
      Temperature(min=273.15, max=573.15, start=300, nominal=300));
-     //substanceNames=data[:].name,
-     // fixedX=true,
-     // reducedX = false,
-     // singleState=false,
-//      nXi = nS-nR-1,
-//      
-//      SpecificEnthalpy(start=if Functions.referenceChoice==ReferenceEnthalpy.ZeroAt25C then 3e5 else 
-//         if Functions.referenceChoice==ReferenceEnthalpy.UserDefined then Functions.h_offset else 0, nominal=1.0e5),
+
 
   redeclare record extends ThermodynamicState "Thermodynamic state variables"
     Real[nF] Xfull;
@@ -40,16 +33,10 @@ package MixtureLiquid "Medium model of a mixture of liquids based on Modelica li
   constant Integer nL = userInterface.nL "Number of liquid species (solutes+solvent) from user interface";
   constant Integer nLi = nL-1 "Number of liquid species (solutes+solvent) -1";
   constant SI.MassFraction[nL] reference_Xfull= userInterface.refXfull "Reference mass fraction vector of all species in the system";
-                              //max(1,nF-1);
   constant Real[nR,nF] nu = userInterface.nu "Stoichiometry matrix of gas-liquid and dissociation equilibria from user interface";
   constant Real[nR,nF] nu_mass = Functions.Reaction.calc_nu_mass(nu) "Mass based stoichiometry matrix of gas-liquid and dissociation equilibria from user interface";
 
-  constant Real[:,:] lambda=
-      Media.Common.Reaction.calc_lambda(
-      nu,
-      nR,
-      nF)
-         "Null space of stoichiometry matrix";
+  constant Real[:,:] lambda= Media.Common.Reaction.calc_lambda(nu, nR, nF) "Null space of stoichiometry matrix";
   constant Real[:,:] lambda_mass= {{lambda[i,j]/MMX[i] for j in 1:nX} for i in 1:nL}*1000 "Null space of mass based stoichiometry matrix";
 
   constant MolarMass MH2O = IF97.MH2O "Molar mass of solvent";

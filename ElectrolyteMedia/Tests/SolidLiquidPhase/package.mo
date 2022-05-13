@@ -233,7 +233,7 @@ package SolidLiquidPhase
     SI.MassFlowRate[ns+nL,N] m_out;
   initial equation
     for n in 1:N loop
-       mred_n[:,n] = transpose(lambda_mass)*medium_n[n].Xfullstart*d_start*B*H*deltaL;
+       mred_n[:,n] = transpose(lambda_mass)*Medium.userInterface.refXfull*d_start*B*H*deltaL;
     end for;
 
   equation
@@ -292,8 +292,8 @@ package SolidLiquidPhase
       lfrac_in=1)
       annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
     annotation (experiment(
-        StopTime=60000,
-        Tolerance=1e-06,
-        __Dymola_Algorithm="Lsodar"));
+      StopTime=60000,
+      Tolerance=1e-06,
+      __Dymola_Algorithm="Lsodar"));
   end ReactiveTransportSimulation;
 end SolidLiquidPhase;
