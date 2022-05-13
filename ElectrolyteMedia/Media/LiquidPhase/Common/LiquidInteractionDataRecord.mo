@@ -1,7 +1,7 @@
 within ElectrolyteMedia.Media.LiquidPhase.Common;
 record LiquidInteractionDataRecord "Coefficient data record for interaction properties between aqueous solute species"
 
-  parameter Integer nLi;
+  parameter Integer nLi = 1;
 
   //Bromley parameter
   Real[nLi,nLi] Bromley_ij = zeros(nLi,nLi) "Bromley parameter";
