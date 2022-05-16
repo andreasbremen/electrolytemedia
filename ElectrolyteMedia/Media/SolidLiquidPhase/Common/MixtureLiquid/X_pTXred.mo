@@ -28,8 +28,6 @@ protected
   SI.MoleFraction[nF] Yfull;
   SI.MassFraction[nF] Xfull;
 
-  Integer index;
-
   Real[nX] Xs;
 algorithm
   //ensure no species amount to be zero for numerical issues

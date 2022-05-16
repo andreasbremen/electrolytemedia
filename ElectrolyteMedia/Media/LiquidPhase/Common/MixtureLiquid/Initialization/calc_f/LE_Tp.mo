@@ -8,19 +8,26 @@ function LE_Tp
   output Real[nL] f;
 
 protected
-  SI.MolarEnergy gi[nL];
+  SI.MolarEnergy gi[nF];
   SI.MolarEnergy gr[nR];
   Real[nR] logK;
   Real[nL] gamma_i;
   Real prod;
   Real[nL] m;
   Real[nL] loga;
+  Real tau = 1e-37;
+  Real[nF] z;
   SI.MoleFraction[nL] Y;
   SI.MassFraction[nL] X;
-  SI.Mass[nL] mass;
+  Real[nF] x_orig "moles in original order";
 algorithm
 
-  Y :=x/sum(x);
+  assert(sum(x[1:nF]) > 0, "x is zero in LE_Tp");
+
+  x_orig :=P_to_orig*x;
+  z :=tau ./ x_orig;
+
+  Y :=x_orig/sum(x_orig);
 
   m[1:nL-1] := Functions.calc_mfromY(Y);
   m[nL] := Y[nL]/MH2O;
@@ -35,11 +42,10 @@ algorithm
   logK :=-gr/Modelica.Constants.R/T;
 
   loga :=log(gamma_i .* m);
-  mass :=x .* MMX;
 
   //isopotential
-  f[1:nR] :=nu*loga - logK;
+  f[1:nR] :=nu*(loga - z) - logK;
 
   //reduced mass balance
-  f[nR+1:nF] :=transpose(lambda_mass)*mass - Xred;
+  f[nR+1:nF] :=transpose(lambda_id)*x - Xred;
 end LE_Tp;

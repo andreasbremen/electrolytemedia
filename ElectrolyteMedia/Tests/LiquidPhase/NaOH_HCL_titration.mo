@@ -31,5 +31,5 @@ model NaOH_HCL_titration "Implementation of partial_Titration"
     mDot_titrant=2.5e-5) annotation (Placement(transformation(extent={{-10,-14},{10,6}})));
    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
-    experiment(StopTime=2000, __Dymola_NumberOfIntervals=4000));
+    experiment(StopTime=2000, Tolerance=1e-06));
 end NaOH_HCL_titration;

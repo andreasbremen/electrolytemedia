@@ -7,34 +7,39 @@ function LE_Tp
   output Real[nL,nL] J;
 
 protected
+  SI.AmountOfSubstance[nF] n;
   SI.MoleFraction[nL] Y;
   SI.MassFraction[nL] X;
   Real[nL] gamma_i;
   Real[nL] m;
+  Real tau = 1e-37;
+  SI.MassFraction[nF] z;
+  Real[nF,nF] H;
+  Real[nF,nF] H_id;
+  Real[nF] diagH;
+  Real[nF] x_orig;
 algorithm
-  assert(sum(x)>0,"Input error: x is zero");
-  Y :=x/sum(x);
 
-  m[1:nL-1] := Functions.calc_mfromY(Y);
-  m[nL] := Y[nL]/MH2O;
+  x_orig :=P_to_orig*x;
 
+  for i in 1:nF loop
+    n[i] :=x_orig[i];//max(tau, x_orig[i]);//x_orig without pivoting, max formulation with pivoting
+  end for;
+
+  Y :=n[1:nF]/sum(n[1:nF]);
   X :=Functions.calc_X(Y);
 
-  gamma_i := Functions.calc_gamma(T,p,X);
+  z :=tau./n;
 
-  for i in  1:nL loop
-    //isopotential
-    for r in 1:nR loop
-      if i < nL then
-        J[r, i] := if abs(nu[r,i]) > 0 then nu[r,i]/x[i] - nu[r,nL]/sum(x) else - nu[r,nL]/sum(x);
-      else
-        J[r,i] :=1/x[i]*(nu[r,i]-sum(nu[r,1:nL-1])) - nu[r,i]/sum(x);
-      end if;
-    end for;
+  diagH :=(1 .- Y .+ z) ./ n;
 
-    //reduced mass balance
-    for j in 1:nL - nR loop
-      J[j + nR, i] := lambda_mass[i, j]*MMX[i];
-    end for;
-  end for;
+  H :=diagonal(diagH);
+  H_id :=transpose(P_to_id)*H;
+
+  //isopotential
+  J[1:nR,:] :=nu*H;
+  J[1:nR,:] :=J[1:nR, :]*transpose(P_to_id);
+
+  //reduced mass balance
+  J[nR+1:nF,:] :=transpose(lambda_id);
 end LE_Tp;

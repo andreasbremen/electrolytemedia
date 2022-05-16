@@ -36,8 +36,18 @@ package MixtureLiquid "Medium model of a mixture of liquids based on Modelica li
   constant Real[nR,nF] nu = userInterface.nu "Stoichiometry matrix of gas-liquid and dissociation equilibria from user interface";
   constant Real[nR,nF] nu_mass = Functions.Reaction.calc_nu_mass(nu) "Mass based stoichiometry matrix of gas-liquid and dissociation equilibria from user interface";
 
-  constant Real[:,:] lambda= Media.Common.Reaction.calc_lambda(nu, nR, nF) "Null space of stoichiometry matrix";
-  constant Real[:,:] lambda_mass= {{lambda[i,j]/MMX[i] for j in 1:nX} for i in 1:nL}*1000 "Null space of mass based stoichiometry matrix";
+//   constant Real[:,:] lambda= Media.Common.Reaction.calc_lambda(nu, nR, nF) "Null space of stoichiometry matrix";
+//   constant Real[:,:] lambda_mass= {{lambda[i,j]/MMX[i] for j in 1:nX} for i in 1:nL}*1000 "Null space of mass based stoichiometry matrix";
+  constant Real[nF,nX] lambda= Media.Common.Reaction.calc_lambda(nu, nR, nF) "Nullspace of stoichiometry matrix";
+  constant Real[nF,nX] lambda_mass={{lambda[i,j]/MMX[i] for j in 1:nX} for i in 1:nF}/1000 "Nullspace of mass based stoichiometry matrix";
+
+  constant Real[nR,nF] nu_id= Media.Common.Reaction.calc_nu_id(nu) "Identity transformation of stoichiometry matrix for initialization";
+  constant Integer[nF,nF] P_to_orig=Media.Common.Reaction.calc_P_nu_id(nu) "Permutation matrix between original order and identity transformation";
+  constant Integer[nF,nF] P_to_id = transpose(P_to_orig) "Permutation matrix between identity transformation and original order";
+  constant Real[nF,nX] lambda_id =  Media.Common.Reaction.calc_lambda_id(nu_id) "lambda in identity transformation";
+  constant Real[nF,nX] lambda_mass_id=P_to_id*lambda_mass "Transformed nullspace of mass based stoichiometry matrix";
+  constant Real[nF,nX] lambda_mass_id_orig = P_to_orig * {{lambda_id[i,j]/MMX_id[i] for j in 1:nX} for i in 1:nF} "Mass based nullspace back transformed from identity transofrmation";
+  constant Real[nF] MMX_id = P_to_id*MMX;
 
   constant MolarMass MH2O = IF97.MH2O "Molar mass of solvent";
   constant SpecificHeatCapacity RH2O = IF97.RH2O "Gas constant of H2O";

@@ -4,90 +4,79 @@ function X_pTXred
   input SI.Pressure p;
   input SI.Temperature T;
   input MassFraction[nX] Xred;
-  input MassFraction[nL] Xinit = zeros(nL);
-  output Real[nL] Xfull;
+  input MassFraction[nF] Xinit = zeros(nF);
+  output Real[nF] x_;
 
 protected
   parameter Real init = 1e-10;
   parameter Real eps = 1e-6;
-  parameter Integer[nR] firstnonzero = {Modelica.Math.BooleanVectors.firstTrueIndex({nu[r,i] <> 0 for i in 1:nL}) for r in 1:nR};
-  parameter Integer[nR] secondnonzero = {Modelica.Math.BooleanVectors.firstTrueIndex({if i>firstnonzero[r] then nu[r,i] <> 0 else false for i in 1:nL}) for r in 1:nR};
 
   MassFraction[nX] Xrednonzero;
+  MassFraction[nX] Xred_;
 
-  Real[nL,nL] J;
-  Real[nL] f;
-  Real[nL] x1;
-  Real[nL] x2;
+  Real[nF,nF] J;
+  Real[nF] f;
+  Real[nF] x1;
+  Real[nF] x2;
 
-  Real[nR,nL] B;
-  Real[nR] b;
+  SI.MoleFraction[nF] Yfull;
+  SI.MassFraction[nF] Xfull;
 
-  SI.MassFraction[nL] Xfull_in;
-  SI.Mass[nL] mfull_in;
-  SI.MoleFraction[nL] Yfull_in;
-  SI.AmountOfSubstance[nL] nfull_in;
-
-  SI.MoleFraction[nL] Yfull;
-
-  SI.MoleFraction[nL] Yinit;
-  SI.AmountOfSubstance[nL] ninit;
-  SI.Mass[nL] minit;
+  SI.MoleFraction[nF] Yinit;
+  SI.AmountOfSubstance[nF] ninit;
+  SI.Mass[nF] minit;
   Real scale;
 
   Boolean solutionfound = false;
 
+  Real[nX] Xs;
 algorithm
-
   //ensure no species amount to be zero for numerical issues
   for i in 1:nX loop
     Xrednonzero[i] :=max(Modelica.Constants.eps, Xred[i]);
   end for;
 
+  //convert reduced mass fraction basis
+  Xs :=Modelica.Math.Matrices.solve(transpose(lambda_mass_id[nR+1:nF, :]), Xrednonzero);
+  Xfull :=cat(1,zeros(nF - nX),Xs);
+  Xfull :=P_to_orig*Xfull;
+
+  Xred_ :=transpose(lambda_mass_id_orig)*Xfull;
+
   // find initial guess x1 for Newton solver
-  for r in 1:nR loop
-    B[r,secondnonzero[r]] :=1;
-    b[r] :=0;
-  end for;
-  Xfull_in := ElectrolyteMedia.Media.Common.equalityLeastSquares(
-    transpose(lambda_mass),
-    Xred,
-    B,
-    b);
-  // nfull_in with positive elements only to fulfill transpose(lambda_mass)*mfull_in = Xred;
-  if sum(Xfull_in) > 0 then
-    mfull_in :=Xfull_in;
-    nfull_in :=mfull_in ./ MMX;
-    for i in 1:nF loop
-      x1[i] :=max(init, nfull_in[i]);
-    end for;
-  elseif sum(Xinit)> 0 then
+  if sum(Xinit)> 0 then
   // ninit from initial guess provided as input (Xinit)
-    scale :=sum(transpose(lambda_mass)*Xinit);
-    minit :=Xinit*scale;
-    Yinit :=Functions.calc_Y(Xinit);
-    ninit :=minit./MMX;
-    for i in 1:nF loop
-      x1[i] :=max(init, ninit[i]);
-    end for;
+     scale :=sum(transpose(lambda_mass_id_orig)*Xinit);
+     minit :=Xinit*scale;
+     ninit :=minit./MMX;
+     for i in 1:nF loop
+       x1[i] :=max(init, ninit[i]);
+     end for;
   else
   // else generic initial guess
-    x1 :=fill(1/nF, nF);
+    for i in 1:nF loop
+      x1[i] :=max(init, Xfull[i]/MMX[i]);
+    end for;
   end if;
 
   // Newton algorithm
   solutionfound :=false;
+  x1 :=P_to_id*x1;
   while not solutionfound loop
-    f :=Initialization.calc_f.LE_Tp(x1,Xrednonzero,T,p);
+    f :=Initialization.calc_f.LE_Tp(x1,Xred_,T,p);
     J :=Initialization.calc_J.LE_Tp(x1,T,p);
-    x2 := Initialization.NewtonStep(x1,f,J,nL);
+    x2 := Initialization.NewtonStep(x1,f,J,nF);
+
+    // check convergence
     if Modelica.Math.Vectors.norm(f,Modelica.Constants.inf) < eps then
-      solutionfound :=true;
+      solutionfound:=true;
     end if;
     x1 :=x2;
   end while;
+  x2 :=P_to_orig*x2;
+  Yfull :=x2[1:nF]/sum(x2[1:nF]);
+  Xfull :=moleToMassFractions(Yfull, MMX);
 
-  Yfull :=x2/sum(x2);
-  Xfull :=Functions.calc_X(Yfull);
+  x_ :=Xfull;
 
 end X_pTXred;
