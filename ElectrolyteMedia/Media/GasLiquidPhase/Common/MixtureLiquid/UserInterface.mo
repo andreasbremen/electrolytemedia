@@ -32,11 +32,11 @@ record UserInterface
   //Reaction
   parameter Integer nR_GL = 1 "Number of gas-liquid equilibria" annotation(Dialog(tab="Reaction"));
 
-  Real[nR_GL,nG+nL] nu_GL = zeros(nR_GL,nG+nL) "Stoichiometry matrix of gas-liquid and dissociation equilibria" annotation(Dialog(tab="Reaction"));
+  Real[nR_GL,nG+nL] nu_GL = cat(2,identity(nR_GL),-ones(nR_GL,nG+nL-nR_GL)) "Stoichiometry matrix of gas-liquid and dissociation equilibria" annotation(Dialog(tab="Reaction"));
 
   parameter Integer nR_L = 1 "Number of dissociation equilibria" annotation(Dialog(tab="Reaction"));
 
-  Real[nR_L,nL] nu_L = zeros(nR_L,nL) "Stoichiometry matrix of dissociation equilibria" annotation(Dialog(tab="Reaction"));
+  Real[nR_L,nL] nu_L = cat(2,identity(nR_L),-ones(nR_L,nL-nR_L)) "Stoichiometry matrix of dissociation equilibria" annotation(Dialog(tab="Reaction"));
 
   final parameter Integer nR = nR_GL + nR_L "Number of gas-liquid and dissociation equilibria";
 

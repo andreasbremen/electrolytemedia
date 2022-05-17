@@ -1,78 +1,93 @@
 within ElectrolyteMedia.Media.GasLiquidPhase.Common.MixtureLiquid.Initialization.calc_f;
 function GLE_Tp
-  "Gas-liquid and dissociation equilibrium with constraints on solute molalities and moles of gas phase"
-  input Real[nG+nL] x "mole fractions of gas and liquid phase for each phase separately";
-  input Real[nG+nL] inert "mole fraction of inert gas phase species and molalities of inert liquid phase species";
+  "GLE initialization according to Leal et al. (2016): calculation of residuals"
+  input Real[nG+nL] x;
+  input Real[nX] Xred;
   input SI.Temperature T;
   input SI.Pressure p;
   output Real[nG+nL] f;
 
 protected
-  SI.SpecificEnergy gi[nG+nL];
+  SI.MolarEnergy gi[nG+nL];
   SI.MolarEnergy gim[nG+nL];
   SI.MolarEnergy gr[nR];
-  Real[nR] K;
+  Real[nR] logK;
   Real[nL] gamma_i;
   Real[nL] m;
-  SI.MoleFraction[nG] Yg = x[1:nG]/sum(x[1:nG]);
-  SI.MoleFraction[nL] Yl = x[1+nG:nG+nL]/sum(x[1+nG:nG+nL]);
-  SI.MassFraction[nG] Xg = Functions.calc_X_M(Yg, MMX[1:nG]);
-  SI.MassFraction[nL] Xl = Functions.LiquidFunctions.calc_X(Yl);
+  Real [nL] a;
+  SI.MoleFraction[nG] Yg;
+  SI.MoleFraction[nL] Yl;
+  SI.MassFraction[nG] Xg;
+  SI.MassFraction[nL] Xl;
   Real[nG] phi;
-  Integer index = 1;
+  Real[nG] fug;
   SI.Density dg;
+  Real tau = 1e-37;
+  SI.MassFraction[nG+nL] z;
+
+  Real[nG+nL] logreacBase;
+  Real[nG+nL] x_orig "moles in original order";
 algorithm
   assert(sum(x) > 0, "x is zero in GLE_Tp");
-  gi :=Functions.calc_gi(T, p);
-  for i in 1:nG+nL loop
-    gim[i] :=gi[i]*MMX[i];
-  end for;
 
-  gamma_i := Functions.LiquidFunctions.calc_gamma(
-      T,
-      p,
-      Xl);
-  dg :=dg_TpX(
-      T,
-      p,
-      Xg);
+  x_orig :=P_to_orig*x;
+  z :=tau ./ x_orig;
+
+
+  Yg :=x_orig[1:nG]/sum(x_orig[1:nG]);
+  Yl :=x_orig[1 + nG:nG + nL]/sum(x_orig[1 + nG:nG + nL]);
+  Xg :=Functions.calc_X_M(Yg, MMX[1:nG]);
+  Xl :=Functions.LiquidFunctions.calc_X(Yl);
+
+  gamma_i := Functions.LiquidFunctions.calc_gamma(T,p,Xl);
+  dg :=dg_TpX(T,p,Xg);
   phi :=Functions.GasFunctions.calc_phi(T,dg,Xg);
 
-  m[1:nL-1] :=Functions.LiquidFunctions.calc_mfromY(x[1+ nG:nG + nL]);
-  m[nL] :=x[nG+nL]/MH2O;
+  m[1:nL-1] :=Functions.LiquidFunctions.calc_mfromY(x_orig[1+ nG:nG + nL]);
+  m[nL] :=Xl[nL]/MH2O;
 
-  for j in 1:nR loop
-    gr[j] :=sum({nu[j, i]*gim[i] for i in 1:nG+nL});
-    K[j] :=exp(-gr[j]/Modelica.Constants.R/T);
-  end for;
+  gi :=Functions.calc_gi(T, p) .* MMX;
+  gr :=nu*gi;
+  logK :=-gr/Modelica.Constants.R/T;
+
+  a :=gamma_i .* m;
+  fug :=Yg .* phi*p/prefg;
+
+  logreacBase :=cat(1,log(fug) - z[1:nG], log(a) - z[nG + 1:nG + nL]);
 
   //isopotential
-  for r in 1:nR loop
-    f[r] :=(sum({if nu[r,i_] <> 0 then log(x[i_]*phi[i_]*p/prefg)*nu[r,i_] else 0 for i_ in 1:nG})+sum({if nu[r,i_+nG] <> 0 then log(gamma_i[i_]*m[i_])*nu[r, i_+nG] else 0 for i_ in 1:nL}) - log(K[r]));
-  end for;
+  f[1:nR] :=nu*logreacBase - logK;
 
-  //nR+1: closure condition gas phase
-  f[nR+1] :=sum(x[1:nG]) - 1;
+  //reduced mass balance
+  f[nR+1:nF] :=transpose(lambda_id)*x - Xred;
 
-  //nR+2: closure condition liquid phase
-  f[nR+2] :=sum(x[1 + nG:nG + nL]) - 1;
-
-  //nR+3: charge balance liquid phase
-  f[nR+3] :=datal[:].z*x[1 + nG:nG + nL - 1];
-
-  //constraints on inert solute molalities and mole fraction of gas phase
-  index :=4;
-   for i in 1:nG+nL loop
-     if sum(abs(nu[:,i])) < Modelica.Constants.eps then
-       if i < nG+1 then
-         f[nR+index] :=1000*(x[i] - inert[i]);
-       else
-         f[nR+index] :=x[i] - x[nG + nL]*MH2O*inert[i];
-       end if;
-       index :=index + 1;
-       if index > nG+nL-nR then
-         break;
-       end if;
-     end if;
-   end for;
+//   //isopotential
+//   for r in 1:nR loop
+//     f[r] :=(sum({if nu[r,i_] <> 0 then log(x[i_]*phi[i_]*p/prefg)*nu[r,i_] else 0 for i_ in 1:nG})+sum({if nu[r,i_+nG] <> 0 then log(gamma_i[i_]*m[i_])*nu[r, i_+nG] else 0 for i_ in 1:nL}) - log(K[r]));
+//   end for;
+//
+//   //nR+1: closure condition gas phase
+//   f[nR+1] :=sum(x[1:nG]) - 1;
+//
+//   //nR+2: closure condition liquid phase
+//   f[nR+2] :=sum(x[1 + nG:nG + nL]) - 1;
+//
+//   //nR+3: charge balance liquid phase
+//   f[nR+3] :=datal[:].z*x[1 + nG:nG + nL - 1];
+//
+//   //constraints on inert solute molalities and mole fraction of gas phase
+//   index :=4;
+//    for i in 1:nG+nL loop
+//      if sum(abs(nu[:,i])) < Modelica.Constants.eps then
+//        if i < nG+1 then
+//          f[nR+index] :=1000*(x[i] - inert[i]);
+//        else
+//          f[nR+index] :=x[i] - x[nG + nL]*MH2O*inert[i];
+//        end if;
+//        index :=index + 1;
+//        if index > nG+nL-nR then
+//          break;
+//        end if;
+//      end if;
+//    end for;
 end GLE_Tp;

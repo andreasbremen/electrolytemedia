@@ -17,6 +17,13 @@ nu_mass
 userInterface
 lambda
 lambda_mass
+nu_id
+P_to_orig
+P_to_id
+lambda_id
+lambda_mass_id
+lambda_mass_id_orig
+MMX_id
 MH2O
 RH2O
 MMX
@@ -47,7 +54,6 @@ T_phX
 T_psX
 p_TdX
 X_pTXred
-X_pTinert
 XT_phXred
 XT_psXred
 Xp_dTXred

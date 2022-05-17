@@ -1,59 +1,51 @@
 within ElectrolyteMedia.Media.GasLiquidPhase.Common.MixtureLiquid.Initialization.calc_J;
 function GLE_Tp
-  "Gas-liquid and dissociation equilibrium with constraints on inert solute molalities and moles of gas phase"
-  input Real[nG+nL] x "mole fractions of gas and liquid phase for each phase separately";
-  input Real[nG+nL] inert "mole fraction of inert gas phase species and molalities of inert liquid phase species";
+  "SLE initialization according to Leal et al. (2016): calculation of Jacobian"
+  input Real[nF] x;
   input SI.Temperature T;
   input SI.Pressure p;
-  output Real[nG + nL,nG + nL] J;
+  output Real[nF,nF] J;
 
 protected
-  Boolean[nG+nL] isinert = {sum(abs(nu[:,i])) < Modelica.Constants.eps for i in 1:nG+nL};
-  Integer index;
+  SI.AmountOfSubstance[nG+nL] n;
+  SI.MoleFraction[nG+nL] Y;
+  SI.MassFraction[nG+nL] X;
+  SI.MoleFraction[nL] Yl;
+  SI.MassFraction[nL] Xl;
+  SI.MoleFraction[nG] Yg;
+  SI.MassFraction[nG] Xg;
+  Real tau = 1e-37;
+  SI.MassFraction[nG+nL] z;
+  Real[nG+nL,nG+nL] H;
+  Real[nG+nL,nG+nL] H_id;
+  Real[nG+nL] diagH;
+  Real[nG+nL] x_orig;
 algorithm
-  for i in  1:nG + nL loop
-    //isopotential
-    for r in 1:nR loop
-      if i < nG+1 then
-        J[r,i] := if nu[r,i]<> 0 then nu[r, i]/x[i] else 0;
-      elseif i == nG+nL then
-         J[r,i] :=-sum({nu[r, i_] for i_ in 1 + nG:nG + nL - 1})/x[i] + nu[r, i]/x[i];
-      else J[r,i] :=if abs(nu[r,i]) > 0 then nu[r, i]/x[i] else 0;
-      end if;
-    end for;
 
-    //nR+1: closure condition gas phase
-    //nR+2: closure condition liquid phase
-    //nR+3: charge balance liquid phase
-    if i < nG+1 then
-      J[nR+1,i] :=1;
-      J[nR+2,i] :=0;
-      J[nR+3,i] :=0;
-    elseif i == nG+nL then
-      J[nR+1,i] :=0;
-      J[nR+2,i] :=1;
-      J[nR+3,i] :=0;
-    else
-      J[nR+1,i] :=0;
-      J[nR+2,i] :=1;
-      J[nR+3,i] :=datal[i-nG].z;
-    end if;
+  x_orig :=P_to_orig*x;
+
+  for i in 1:nG+nL loop
+    n[i] :=x_orig[i];//max(tau, x_orig[i]);//x_orig without pivoting, max formulation with pivoting
   end for;
 
-  //constraints on inert solute molalities and mole fraction of gas phase
-  index :=4;
-  for i in 1:nG+nL-1 loop
-    if isinert[i] then
-      if i < nG+1 then
-        J[nR+index,i] :=1000;
-      else
-        J[nR+index,i] :=1;
-        J[nR+index,nG+nL] :=-MH2O*inert[i];
-      end if;
-      index :=index + 1;
-       if index > nG+nL-nR then
-         break;
-       end if;
-    end if;
-  end for;
+  Y :=n[1:nG+nL]/sum(n[1:nG+nL]);
+  X :=Functions.calc_Xfull(Y);
+
+  Yg :=Y[1:nG]/sum(Y[1:nG]);
+  Yl :=Y[1 + nG:nG + nL]/sum(Y[1 + nG:nG + nL]);
+
+  z :=tau./n;
+
+  diagH[1:nG] :=(1 .- Yg .+ z[1:nG]) ./ n[1:nG];
+  diagH[nG+1:nG+nL] :=(1 .- Yl .+ z[nG+1:nG+nL]) ./ n[nG + 1:nG + nL];
+
+  H :=diagonal(diagH);
+  H_id :=transpose(P_to_id)*H;
+
+  //isopotential
+  J[1:nR,:] :=nu*H;
+  J[1:nR,:] :=J[1:nR, :]*transpose(P_to_id);
+
+  //reduced mass balance
+  J[nR+1:nF,:] :=transpose(lambda_id);
 end GLE_Tp;

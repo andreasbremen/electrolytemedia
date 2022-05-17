@@ -30,3 +30,4 @@ LiquidFunctions
 GasFunctions
 moleToMassFractions
 massToMoleFractions
+calc_Xfull

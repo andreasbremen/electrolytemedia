@@ -25,9 +25,6 @@ protected
 
   Real[ns+nL] logreacBase;
   Real[ns+nL] x_orig "moles in original order";
-
-  SI.Mass[ns+nL] mass;
-
 algorithm
 
   assert(sum(x[1:ns+nL]) > 0, "x is zero in SLE_Tp");

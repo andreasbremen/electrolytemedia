@@ -12,7 +12,7 @@ protected
   Real[nNS] alpha;
   Real delta = 0.9999;
    Real[nNS,nNS] invJ= Modelica.Math.Matrices.inv(J);
-  Real[nNS] delta_x =  invJ*f;//Modelica.Math.Matrices.solve(J,f);//
+  Real[nNS] delta_x =  invJ*f;
 algorithm
 
    for i in 1:nNS loop
@@ -24,12 +24,4 @@ algorithm
    end for;
    beta :=min(alpha);
    x_ :=x - beta*delta_x;
-
-//    while min(x_temp) < 0 loop
-//      x_temp :=x - 1/beta*invJ*f;
-//      beta :=beta *10;
-//    end while;
-//    assert(min(x_temp)>0,"Newton step too small");
-//    x_ :=x_temp;
-
 end NewtonStep;
