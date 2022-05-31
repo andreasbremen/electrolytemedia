@@ -32,6 +32,6 @@ it can be redistributed and/or modified under the terms of the [BSD 3-Clause](ht
 ## Contributors
 
 * [Andreas M. Bremen](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~obmh/Bremen-Andreas/?lidx=1): Revisited the methods and wrote the code for the `ElectrolyteMedia` package.
-* [Alexander Mitsos](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~iswv/Mitsos-Alexander/?lidx=1): Provided ideas and guidance for the development of the code.
+* [Alexander Mitsos](https://www.avt.rwth-aachen.de/cms/AVT/Die-AVT/Team/AlleMitarbeiter/~iswv/Mitsos-Alexander/?lidx=1): Provided ideas and guidance for the development of the methods.
 
 We greatfully acknowledge the contributions from various student theses that helped develop and debug the various `Media` packages.
