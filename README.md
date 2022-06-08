@@ -16,9 +16,7 @@ We will shortly add a reference to a submitted manuscript that discusses the und
 
 ## Current release
 
-Download [ElectrolyteMedia v0.1 (2022-05-09)](../../archive/v0.1.zip)
-
-This is the initial release.
+Download [ElectrolyteMedia v0.2 (2022-06-08)](../../archive/v0.2.zip)
 
 ## Compatibility
 
